@@ -957,6 +957,18 @@ function esperarICE(p, ms){
   });
 }
 
+// Errores al pedir la conexión. Devuelve true si ya se encargó.
+function tratarError(status, j, nom){
+  if(status === 200) return false;
+  if(status === 401){ errorFatal("Contraseña incorrecta.", "Edita la PC y revisa la contraseña que muestra “Esta PC” en la otra computadora."); return true; }
+  if(status === 403){ errorFatal("Rechazaron la conexión en la PC."); return true; }
+  if(status === 409){ aviso(escapar(j.error || "La PC está ocupada."), true, "Reintentando…"); programarReintento(4000); return true; }
+  if(status === 504){ sinRespuesta(nom, "La PC no responde por internet.", "¿Está encendida, con RemotoPC abierto y “Compartir” activado (y con internet)? Si la PC tiene una versión anterior a la 0.14, actualízala."); return true; }
+  if(status === 502 || status === 0){ sinRespuesta(nom, "No hay salida a internet.", escapar(j.error || "") ); return true; }
+  if(status === 429){ aviso("Demasiados intentos seguidos", true, "El punto de encuentro pide esperar un minuto. Reintentando solo…"); programarReintento(65000); return true; }
+  errorFatal("La PC respondió con un error", escapar(j.error || status)); return true;
+}
+
 // Por dónde ir: la red local si la PC responde ahí (lo más directo); si no, internet.
 async function elegirRuta(eq){
   if(eq.web || !eq.codigo || !puedeInternet()) return "local";
@@ -987,7 +999,19 @@ async function conectar(eq){
   const miRuta = await elegirRuta(eq);
   if(actual !== eq || manual) return;
   ruta = miRuta;
-  if(ruta === "internet") aviso("Buscando a <b>" + nom + "</b> por internet…", true);
+  if(ruta === "internet"){
+    aviso("Buscando a <b>" + nom + "</b> por internet…", true);
+    // Paso 1: pedir permiso (si nadie responde en la PC, se espera unos segundos).
+    // Recién después se prepara la conexión, para que no "venza" mientras tanto.
+    const avisoP = setTimeout(() => {
+      if(actual === eq && !manual) aviso("Esperando que acepten en <b>" + nom + "</b>…", true, "Si nadie responde, entrarás en unos segundos con tu contraseña.");
+    }, 3500);
+    const per = await pedirInternet("permiso", eq.codigo, eq.clave || "", {equipo: await miEquipo()});
+    clearTimeout(avisoP);
+    if(actual !== eq || manual) return;
+    if(tratarError(per.status, per.j || {}, nom)) return;
+    aviso("Conectando a <b>" + nom + "</b>…", true, "Abriendo camino directo por internet…");
+  }
   const ice = ruta === "internet" ? await servidoresICE() : [];
   if(actual !== eq || manual) return;
   const miPc = new RTCPeerConnection({iceServers: ice});
@@ -1090,13 +1114,7 @@ async function conectar(eq){
     }
     clearTimeout(avisoEspera);
     if(pc !== miPc) return;
-    if(r.status === 401){ errorFatal("Contraseña incorrecta.", "Edita la PC y revisa la contraseña que muestra “Esta PC” en la otra computadora."); return; }
-    if(r.status === 403){ errorFatal("Rechazaron la conexión en la PC."); return; }
-    if(r.status === 409){ aviso(escapar(j.error || "La PC está ocupada."), true, "Reintentando…"); programarReintento(4000); return; }
-    if(r.status === 504){ sinRespuesta(nom, "La PC no responde por internet.", "¿Está encendida, con RemotoPC abierto y “Compartir” activado (y con internet)?"); return; }
-    if(r.status === 502){ sinRespuesta(nom, "No hay salida a internet.", escapar(j.error || "") ); return; }
-    if(r.status === 429){ aviso("Demasiados intentos seguidos", true, "El punto de encuentro pide esperar un minuto. Reintentando solo…"); programarReintento(65000); return; }
-    if(!r.ok){ errorFatal("La PC respondió con un error", escapar(j.error || r.status)); return; }
+    if(tratarError(r.status, j, nom)) return;
     llegoRespuesta = true;
     aviso("Conectando a <b>" + nom + "</b>…", true, ruta === "internet" ? "Abriendo camino directo por internet…" : "");
     await miPc.setRemoteDescription({type: "answer", sdp: j.sdp});
