@@ -550,6 +550,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
 <!-- ================= VISOR ================= -->
 <div id="visor" class="oculto">
   <video id="video" muted playsinline disablepictureinpicture></video>
+  <audio id="sonido" autoplay></audio>
   <div id="capa" tabindex="0"></div>
   <div id="burbuja" title="Menú de RemotoPC (puedes arrastrarlo)"><span id="anilloB"></span><span id="caraB"></span></div>
   <div id="barra">
@@ -567,6 +568,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
       <button class="pbb" id="bTeclas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><span>Enviar teclas</span></button>
       <button class="pbb" id="bCalidad"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Calidad</span></button>
       <button class="pbb" id="bReconectar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>Reconectar</span></button>
+      <button class="pbb" id="bSonido"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path id="bSonidoOnda" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path id="bSonidoX" d="M22 9l-6 6M16 9l6 6" style="display:none"/></svg><span id="bSonidoTxt">Sonido</span></button>
       <button class="pbb oculto" id="bToque"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 10a2 2 0 0 1 4 0v2M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.5L4 15a2 2 0 0 1 3.4-2L9 15"/></svg><span id="bToqueTxt">Toque: touchpad</span></button>
       <button class="pbb rojo" id="bSalir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Desconectar</span></button>
     </div>
@@ -602,6 +604,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
       <div class="atajo"><span>Modo juego</span><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Shift</kbd><kbd>G</kbd></span></div>
       <div class="atajo"><span>Desconectar</span><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Shift</kbd><kbd>Q</kbd></span></div>
       <div class="atajo"><span>Diagnóstico</span><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Shift</kbd><kbd>D</kbd></span></div>
+      <div class="atajo"><span>Silenciar</span><span><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>Shift</kbd><kbd>M</kbd></span></div>
     </div>
     <h4>Consejos</h4>
     <ul class="tips">
@@ -942,7 +945,7 @@ function limpiar(){
   if(dcMouse){ try{ dcMouse.close(); }catch(e){} }
   dcMouse = null; capa.style.cursor = "default";
   if(pc){ try{ pc.close(); }catch(e){} }
-  pc = null; dc = null; video.srcObject = null; statsPrev = null; sinCuadros = 0; retrasoReal = null;
+  pc = null; dc = null; video.srcObject = null; sonidoEl.srcObject = null; statsSonido = null; saltosSonido = 0; statsPrev = null; sinCuadros = 0; retrasoReal = null;
   avisarCaptura(false);
 }
 
@@ -995,12 +998,14 @@ async function conectar(eq){
     const h264 = caps.filter(c => c.mimeType === "video/H264");
     if(h264.length && tr.setCodecPreferences) tr.setCodecPreferences(h264.concat(caps.filter(c => c.mimeType !== "video/H264")));
   }catch(e){}
+  // Sonido de la PC (pista aparte del video).
+  try{ miPc.addTransceiver("audio", {direction: "recvonly"}); }catch(e){}
   const miDc = miPc.createDataChannel("input", {ordered: true});
   dc = miDc;
   // Canal rápido para mover el mouse: sin esperas ni reenvíos.
   const miDcMouse = miPc.createDataChannel("mouse", {ordered: false, maxRetransmits: 0});
   dcMouse = miDcMouse;
-  miDc.onopen = () => { if(pc === miPc) avisarCaptura(true); };
+  miDc.onopen = () => { if(pc === miPc){ avisarCaptura(true); avisarOyendo(); } };
   miDc.onmessage = ev => {
     let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
     if(m.t === "info"){ codificador = m.codificador; if(m.nombre) estado(m.nombre, "si"); if(m.pantalla) infoHost = {pantalla: m.pantalla, marca: m.marca || 48}; }
@@ -1013,6 +1018,13 @@ async function conectar(eq){
   };
   miPc.ontrack = ev => {
     const r = ev.receiver;
+    if(ev.track.kind === "audio"){
+      try{ r.jitterBufferTarget = 0; }catch(e){}
+      sonidoListo = false;
+      sonidoEl.srcObject = new MediaStream([ev.track]);
+      aplicarSonido();
+      return;
+    }
     try{ r.jitterBufferTarget = 0; }catch(e){}
     try{ r.playoutDelayHint = 0; }catch(e){}
     video.srcObject = ev.streams[0] || new MediaStream([ev.track]);
@@ -1057,7 +1069,7 @@ async function conectar(eq){
     const avisoEspera = setTimeout(() => {
       if(pc === miPc) aviso("Esperando que acepten en <b>" + nom + "</b>…", true, "Si nadie responde, entrarás en unos segundos con tu contraseña.");
     }, ruta === "internet" ? 3500 : 1200);
-    const pedido = {sdp: miPc.localDescription.sdp, fps: q.fps, mbps: q.mbps,
+    const pedido = {audio: true, sdp: miPc.localDescription.sdp, fps: q.fps, mbps: q.mbps,
       alto: (RESOLUCIONES[eq.resolucion] || RESOLUCIONES.nativa).alto, equipo: yo};
     let r, j;
     try{
@@ -1130,7 +1142,7 @@ function desconectar(){
 function reconectarYa(){ if(actual){ cerrarMenus(); toast("Reconectando…"); conectar(actual); } }
 
 // ---------------- Estadísticas y vigilante ----------------
-let statsPrev = null, codificador = "", sinCuadros = 0;
+let statsPrev = null, codificador = "", sinCuadros = 0, statsSonido = null, saltosSonido = 0;
 async function actualizarStats(){
   if(!pc) return;
   let inb = null, par = null;
@@ -1172,6 +1184,19 @@ async function actualizarStats(){
     } else sinCuadros = 0;
   }
   if(inb.frameWidth) det.push(inb.frameWidth + "×" + inb.frameHeight);
+  // Sonido: si al empezar quedó audio acumulado (el reproductor tardó en arrancar),
+  // pedir a la PC que salte ese pedazo para que suene al instante.
+  let aud = null;
+  rep.forEach(x => { if(x.type === "inbound-rtp" && x.kind === "audio") aud = x; });
+  if(aud && aud.jitterBufferEmittedCount){
+    const sa = statsSonido;
+    if(sa && aud.jitterBufferEmittedCount > sa.em){
+      const prom = (aud.jitterBufferDelay - sa.jb) / (aud.jitterBufferEmittedCount - sa.em) * 1000;
+      if(prom > 140 && saltosSonido < 3){ saltosSonido++; enviar(["saltar", Math.min(1000, Math.round(prom - 50))]); }
+      det.push("sonido " + prom.toFixed(0) + " ms");
+    }
+    statsSonido = {em: aud.jitterBufferEmittedCount, jb: aud.jitterBufferDelay};
+  }
   if(par){
     let tipo = "";
     rep.forEach(x => { if(x.id === par.remoteCandidateId) tipo = x.candidateType; if(x.id === par.localCandidateId && x.candidateType === "relay") tipo = "relay"; });
@@ -1252,7 +1277,39 @@ capa.addEventListener("wheel", e => {
   if(e.deltaX) enviar(["h", Math.round(e.deltaX * k)]);
 }, {passive: false});
 
+// ---------------- Sonido ----------------
+const sonidoEl = $("sonido");
+// Avisar a la PC que el reproductor ya anda: recién ahí manda el sonido (así
+// no se acumula audio al principio y suena al instante).
+let sonidoListo = false;
+function avisarOyendo(){ if(sonidoListo && dc && dc.readyState === "open") enviar(["sonido"]); }
+sonidoEl.addEventListener("playing", () => { sonidoListo = true; avisarOyendo(); });
+function aplicarSonido(){
+  const mudo = !!config.silencio;
+  sonidoEl.muted = mudo;
+  $("bSonidoTxt").textContent = mudo ? "Sin sonido" : "Sonido";
+  $("bSonidoOnda").style.display = mudo ? "none" : "";
+  $("bSonidoX").style.display = mudo ? "" : "none";
+  $("bSonido").classList.toggle("activo", !mudo);
+  if(sonidoEl.srcObject){
+    const p = sonidoEl.play();
+    if(p) p.catch(() => {
+      // El navegador pide un toque antes de reproducir sonido.
+      mostrarPista("Toca la pantalla para activar el <b>sonido</b>", 3500);
+      const una = () => { sonidoEl.play().catch(() => {}); capa.removeEventListener("pointerdown", una); };
+      capa.addEventListener("pointerdown", una);
+    });
+  }
+}
+function alternarSonido(){
+  config.silencio = !config.silencio;
+  guardarConfig(); aplicarSonido();
+  toast(config.silencio ? "Sonido silenciado" : "Sonido activado");
+}
+$("bSonido").onclick = alternarSonido;
+
 function atajo(code){
+  if(code === "KeyM"){ alternarSonido(); return true; }
   if(code === "KeyF"){ alternarPantallaCompleta(); return true; }
   if(code === "KeyG"){ alternarModoJuego(); return true; }
   if(code === "KeyQ"){ desconectar(); return true; }
