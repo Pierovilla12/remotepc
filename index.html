@@ -19,14 +19,16 @@
   svg{flex:none}
 
   /* ================= INICIO ================= */
-  #inicio{height:100%;overflow:auto;
+  #inicio{height:100%;overflow:auto;overflow-x:hidden;
     background:radial-gradient(1100px 420px at 50% -180px, rgba(76,141,255,.16), transparent 70%), var(--fondo)}
-  .contenedor{max-width:880px;margin:0 auto;padding:34px 22px 40px}
-  header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  .contenedor{max-width:1440px;margin:0 auto;padding:28px clamp(18px,3vw,44px) 32px}
+  #inicio,.fondo-modal{zoom:var(--escala,1)}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
   .logo{width:46px;height:46px;flex:none;filter:drop-shadow(0 6px 16px rgba(45,212,191,.35))}
   .marca{flex:1;min-width:0}
   .marca b{font-size:19px;font-weight:650;display:block;letter-spacing:.2px}
   .marca span{color:var(--suave);font-size:12.5px}
+  @media (max-width:640px){header{gap:8px;flex-wrap:wrap} header .marca{width:auto!important;flex:1 1 140px!important} header .marca span{display:none} .pestanas{order:5;width:100%;margin-right:0} .pestanas button{flex:1;justify-content:center}}
 
   .btn{border:0;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:600;background:var(--acento);color:#fff;
     display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,transform .05s,opacity .15s}
@@ -38,7 +40,7 @@
   .btn.icono{padding:0;width:36px;height:36px}
   .btn[disabled]{opacity:.45;cursor:default}
 
-  .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
   .pc{background:var(--panel);border:1px solid var(--borde);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;
     transition:border-color .15s,transform .15s,box-shadow .15s;position:relative}
   .pc:hover{border-color:var(--borde2);transform:translateY(-2px);box-shadow:0 14px 34px rgba(0,0,0,.35)}
@@ -72,6 +74,8 @@
   .cal{border:1px solid var(--borde2);background:var(--fondo);border-radius:11px;padding:9px 11px;cursor:pointer;text-align:left;transition:.12s}
   .cal b{display:block;font-size:13px} .cal small{color:var(--suave);font-size:11.5px}
   .calidades.res{grid-template-columns:repeat(4,1fr)}
+  #formPC .modal{max-width:680px}
+  @media (min-width:700px){#formPC .calidades:not(.res){grid-template-columns:repeat(5,1fr)}}
   .cal.sel{border-color:var(--acento);background:rgba(76,141,255,.09);box-shadow:0 0 0 3px rgba(76,141,255,.12)}
   .check{display:flex;align-items:center;gap:8px;margin-top:14px;color:var(--suave);font-size:13px;cursor:pointer}
   .check input{accent-color:var(--acento);width:16px;height:16px}
@@ -133,8 +137,15 @@
   .punto.esp{background:var(--aviso)}
 
   /* ================= ESTA PC ================= */
-  .colus{display:grid;grid-template-columns:1.05fr 1fr;gap:14px;align-items:start}
-  @media (max-width:820px){.colus{grid-template-columns:1fr}}
+  /* Columnas de "Esta PC": 3 en pantallas anchas, 2 en medianas, 1 en celular.
+     (La clase a1/a2/a3 la pone ajustarEscala() según el ancho real disponible.) */
+  .colus{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+  .colus .tarjeta:last-child{margin-bottom:0}
+  .a2 .colus{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .a2 .colus .col3{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+  .a2 .colus .col3 .tarjeta{margin-bottom:0}
+  .a1 .colus{grid-template-columns:1fr}
+  .a1 .colus .tarjeta:last-child{margin-bottom:14px}
   .tarjeta{background:var(--panel);border:1px solid var(--borde);border-radius:16px;padding:16px;margin-bottom:14px}
   .titulo{font-size:11.5px;font-weight:650;color:var(--suave);text-transform:uppercase;letter-spacing:.7px;margin:0 0 10px}
   .compartir{display:flex;gap:14px;align-items:center}
@@ -237,7 +248,7 @@
     border-bottom-width:3px;font:600 11.5px "Segoe UI",sans-serif;color:var(--texto);margin:0 1px}
 
   /* Esta PC */
-  .hero-esta{display:grid;grid-template-columns:150px 1fr auto;gap:22px;align-items:center;padding:22px;border-radius:22px;
+  .hero-esta{display:grid;grid-template-columns:110px 1fr auto;gap:22px;align-items:center;padding:14px 22px;border-radius:22px;
     background:linear-gradient(135deg,rgba(45,212,191,.07),rgba(139,92,246,.06)),var(--panel)}
   @media (max-width:760px){.hero-esta{grid-template-columns:1fr;text-align:center}}
   .hero-esta .etiqueta{font-size:11px;font-weight:700;letter-spacing:1px;color:var(--suave);text-transform:uppercase}
@@ -246,8 +257,8 @@
   .control small{color:var(--suave);font-size:12px;font-weight:600}
   .sw.grande{width:66px;height:36px} .sw.grande::after{width:28px;height:28px;top:4px;left:4px} .sw.grande.on::after{left:34px}
   .sw.grande.on{background:linear-gradient(135deg,#2dd4bf,#22c55e);box-shadow:0 0 22px rgba(45,212,191,.45)}
-  .radar{position:relative;width:130px;height:130px;display:grid;place-items:center;margin:0 auto}
-  .radar svg{width:86px;height:86px;position:relative;z-index:1;transition:filter .3s}
+  .radar{position:relative;width:104px;height:104px;display:grid;place-items:center;margin:0 auto}
+  .radar svg{width:68px;height:68px;position:relative;z-index:1;transition:filter .3s}
   .radar span{position:absolute;inset:0;border-radius:50%;border:2px solid #2dd4bf;opacity:0}
   .radar.on span{animation:onda 2.6s ease-out infinite} .radar.on span:nth-child(2){animation-delay:.85s} .radar.on span:nth-child(3){animation-delay:1.7s}
   .radar.con span{border-color:#60a5fa}
@@ -301,6 +312,17 @@
     cursor:pointer;color:#c9d1dd;font-size:12px;text-align:left}
   .pbb:hover{background:#1e2533;color:#fff}
   .pbb.ancho{width:100%;margin-top:6px;justify-content:center}
+  #barra{max-height:calc(100vh - 16px);overflow-y:auto;overscroll-behavior:contain}
+  #barra > *{flex-shrink:0} /* que no se aplasten: si no entra, el panel se desplaza */
+  .nota-web{font-size:11.5px;line-height:1.4;color:#fbbf24;padding:4px 10px 8px}
+  .pb-formas{margin-top:8px;font-size:12px;line-height:1.5;color:var(--suave,#9aa4b2);max-height:200px;overflow:auto}
+  .pb-formas .fcab{display:flex;align-items:center;gap:6px;padding:2px 0 4px}
+  .pb-formas .fcab span{flex:1;color:#4ade80;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pb-formas .fcab button{background:rgba(255,255,255,.08);border:0;color:#cfd6e2;border-radius:6px;padding:3px 7px;font-size:11px;cursor:pointer}
+  .pb-formas .f{display:flex;justify-content:space-between;gap:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .pb-formas .f b{color:#fff;font-weight:600;white-space:nowrap}
+  .pb-formas .f.mejor b,.pb-formas .f.mejor span{color:#4ade80}
+  .pb-formas .f span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .pbb[disabled]{opacity:.6;cursor:wait}
   .pbb.on{background:rgba(76,141,255,.16);border-color:rgba(76,141,255,.4);color:#9cc0ff}
   .pbb.rojo:hover{background:rgba(240,96,90,.14);color:#ff8f89;border-color:rgba(240,96,90,.4)}
@@ -322,7 +344,7 @@
 .qr-inet{display:flex;gap:18px;align-items:center;margin-top:14px;padding:14px;border-radius:16px;
   background:linear-gradient(135deg,rgba(45,212,191,.10),rgba(76,141,255,.10) 55%,rgba(167,139,250,.10));border:1px solid rgba(94,234,212,.22)}
 .qr-marco{padding:3px;border-radius:20px;background:linear-gradient(135deg,#2dd4bf,#4c8dff,#a78bfa);flex:none;box-shadow:0 8px 28px rgba(45,212,191,.18)}
-.qr.grande{width:156px;height:156px;padding:10px;border-radius:17px}
+.qr.grande{width:140px;height:140px;padding:9px;border-radius:16px}
 .qr-inet-txt > b{display:block;font-size:14.5px;margin-bottom:4px}
 .qr-inet-txt small{color:var(--suave);line-height:1.5;display:block}
 .qr-botones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
@@ -338,6 +360,20 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
 .inet-estado i.esp{background:#e7a93b}
 .inet-estado i.no{background:#f0605a}
 .pill.inet{background:rgba(76,141,255,.14);color:#9cc0ff;border-color:rgba(76,141,255,.35)}
+/* Archivos y portapapeles */
+#transfer{position:absolute;left:14px;bottom:14px;z-index:8;width:min(340px,calc(100% - 28px));display:flex;flex-direction:column;gap:8px}
+.tf{background:rgba(16,20,28,.94);backdrop-filter:blur(10px);border:1px solid var(--borde2);border-radius:14px;padding:10px 12px;box-shadow:0 12px 34px rgba(0,0,0,.45);font-size:12.5px}
+.tf-cab{display:flex;align-items:center;gap:8px}
+.tf-cab b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.tf-cab button{border:0;background:transparent;color:var(--suave);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:6px}
+.tf-cab button:hover{background:rgba(255,255,255,.08);color:#fff}
+.tf-barra{height:5px;border-radius:9px;background:var(--panel2);overflow:hidden;margin:8px 0 4px}
+.tf-barra div{height:100%;background:linear-gradient(90deg,#2dd4bf,#4c8dff);transition:width .2s}
+.tf small{color:var(--suave)}
+.tf-acc{display:flex;gap:8px;margin-top:8px}
+#soltar{position:absolute;inset:14px;z-index:9;border:2.5px dashed rgba(94,234,212,.8);border-radius:22px;background:rgba(11,14,19,.72);
+  display:grid;place-items:center;pointer-events:none;text-align:center;backdrop-filter:blur(3px)}
+#soltar b{display:block;font-size:20px} #soltar small{color:var(--suave);font-size:13px}
 </style>
 </head>
 <body>
@@ -407,8 +443,8 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
         </div>
       </section>
 
-      <div class="colus hOn">
-        <div>
+      <div class="colus">
+        <div class="col hOn">
           <section class="tarjeta" id="tInternet">
             <div class="titulo">Desde cualquier lugar · código de internet</div>
             <div class="dir-principal">
@@ -434,20 +470,6 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
             </div>
           </section>
           <section class="tarjeta">
-            <div class="titulo">En la misma red (WiFi o cable) · más directo</div>
-            <div class="dir-principal">
-              <div class="ip" id="dirPrincipal">—</div>
-              <button class="btn sec icono" id="copiarDir" title="Copiar">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
-            </div>
-            <details id="otras"><summary id="otrasTitulo">Otras direcciones</summary><div id="listaOtras" style="margin-top:6px"></div></details>
-            <details class="qr-local"><summary>QR para entrar desde el celular en este mismo WiFi</summary>
-              <div class="qr-fila" style="border-top:0;margin-top:6px;padding-top:4px">
-                <div class="qr" id="qr"></div>
-                <div><small>Escanéalo con la cámara (conectado al mismo WiFi) y se abre RemotoPC en el navegador, sin pasar por internet. Solo te pedirá la contraseña.</small></div>
-              </div></details>
-          </section>
-          <section class="tarjeta">
             <div class="titulo">Contraseña</div>
             <div class="clave">
               <div class="valor" id="claveHost">••••••••••</div>
@@ -463,16 +485,70 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
             </div>
           </section>
         </div>
-        <div>
+        <div class="col hOn">
           <section class="tarjeta">
-            <div class="titulo">Equipos de confianza</div>
-            <div class="interruptor" id="interruptor">
-              <div><b>Pedir aceptar a equipos nuevos</b><small>Si nadie responde en 20 s, entra con la contraseña.</small></div>
-              <span class="sw" id="swPedir"></span>
+            <div class="titulo">En la misma red (WiFi o cable) · más directo</div>
+            <div class="dir-principal">
+              <div class="ip" id="dirPrincipal">—</div>
+              <button class="btn sec icono" id="copiarDir" title="Copiar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
             </div>
-            <div id="listaConfianza"></div>
+            <details id="otras"><summary id="otrasTitulo">Otras direcciones</summary><div id="listaOtras" style="margin-top:6px"></div></details>
+            <details class="qr-local"><summary>QR para entrar desde el celular en este mismo WiFi</summary>
+              <div class="qr-fila" style="border-top:0;margin-top:6px;padding-top:4px">
+                <div class="qr" id="qr"></div>
+                <div><small>Escanéalo con la cámara (conectado al mismo WiFi) y se abre RemotoPC en el navegador, sin pasar por internet. Solo te pedirá la contraseña.</small></div>
+              </div></details>
           </section>
-          <section class="tarjeta">
+          <section class="tarjeta" id="tRelevo">
+            <div class="titulo">Relevo para redes difíciles · gratis</div>
+            <div class="inet-estado" style="margin-top:0"><i id="relPunto"></i><span id="relTexto">…</span></div>
+            <div class="oculto" id="relUso" style="margin-top:8px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--suave)"><span>Usado este mes por el relevo</span><b id="relUsoTxt">0 GB</b></div>
+              <div style="height:6px;border-radius:4px;background:var(--panel2);margin-top:5px;overflow:hidden"><div id="relUsoBarra" style="height:100%;width:0;background:linear-gradient(90deg,#2dd4bf,#4c8dff)"></div></div>
+              <small style="color:var(--tenue);font-size:11.5px">Cloudflare regala 1.000 GB al mes. Al llegar a 900 GB, RemotoPC deja de usarlo hasta el mes siguiente: nunca te cobran.</small>
+            </div>
+            <details class="qr-local"><summary>¿Para qué sirve?</summary>
+              <div style="color:var(--suave);font-size:12.5px;margin-top:6px;line-height:1.5">
+                Algunas redes (sobre todo <b>datos móviles</b>) no dejan conexión directa: se queda en “Abriendo camino…” y falla.
+                Con el relevo, en esos casos el video pasa por un servidor intermedio. Si hay camino directo, se sigue usando el directo. En la laptop no se instala nada.
+              </div></details>
+            <details class="qr-local" id="relDetallesE"><summary>Configurar con ExpressTURN (1 TB gratis, sin tarjeta, servidores lejos)</summary>
+              <ol style="color:var(--suave);font-size:12.5px;line-height:1.6;padding-left:18px;margin:8px 0">
+                <li>Crea una cuenta gratis en <b>expressturn.com</b> (solo correo).</li>
+                <li>En su panel aparecen tus datos de TURN: <b>servidor</b>, <b>usuario</b> y <b>contraseña</b>.</li>
+                <li>Pégalos aquí y toca “Probar y guardar”.</li>
+              </ol>
+              <label class="campo">Servidor</label>
+              <input type="text" id="relEServ" autocomplete="off" spellcheck="false" placeholder="relay1.expressturn.com">
+              <div class="dos-campos">
+                <div><label class="campo">Usuario</label><input type="text" id="relEUsu" autocomplete="off" spellcheck="false"></div>
+                <div><label class="campo">Contraseña</label><input type="password" id="relEClave" autocomplete="off" spellcheck="false"></div>
+              </div>
+              <div class="qr-botones">
+                <button class="btn chico" id="relEGuardar">Probar y guardar</button>
+                <button class="btn sec chico oculto" id="relEQuitar">Quitar</button>
+              </div>
+            </details>
+            <details class="qr-local" id="relDetalles"><summary>Configurar con Cloudflare (relevo en Lima, 1.000 GB gratis al mes) · recomendado</summary>
+              <ol style="color:var(--suave);font-size:12.5px;line-height:1.6;padding-left:18px;margin:8px 0">
+                <li>Crea una cuenta gratis en <b>dash.cloudflare.com</b>.</li>
+                <li>Menú <b>Realtime</b> (o “Calls”) → <b>TURN Server</b> → <b>Create</b>.</li>
+                <li>Copia el <b>Turn Token ID</b> y el <b>API Token</b> y pégalos aquí.</li>
+              </ol>
+              <label class="campo">Turn Token ID</label>
+              <input type="text" id="relID" autocomplete="off" spellcheck="false" placeholder="Ej.: 1a2b3c4d…">
+              <label class="campo">API Token</label>
+              <input type="password" id="relToken" autocomplete="off" spellcheck="false" placeholder="Se muestra una sola vez en Cloudflare">
+              <div class="qr-botones">
+                <button class="btn chico" id="relGuardar">Probar y guardar</button>
+                <button class="btn sec chico oculto" id="relQuitar">Quitar relevo</button>
+              </div>
+            </details>
+          </section>
+        </div>
+        <div class="col col3">
+          <section class="tarjeta hOn">
             <div class="titulo">Control total · apps de administrador</div>
             <div style="color:var(--suave);font-size:12.5px;margin:-2px 0 10px">¿Un aviso de “¿Permitir que esta app haga cambios?” o una app de administrador te deja atascado desde la laptop? El ayudante puede presionar esos botones a distancia.</div>
             <div class="interruptor" style="cursor:default">
@@ -490,15 +566,20 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
                 <div style="margin-top:8px"><button class="btn peligro chico oculto" id="bAyuQuitar">Quitar ayudante</button></div></div>
             </details>
           </section>
+          <section class="tarjeta" id="tActividad">
+            <details id="detActividad" style="margin:0"><summary style="margin:0">Actividad (para encontrar fallas)</summary><div class="log" id="log"></div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+                <button class="btn sec chico" id="bReprobar">Volver a probar las formas de captura</button>
+                <small style="color:var(--tenue)">Útil después de actualizar drivers o RemotoPC: busca de nuevo la más rápida.</small>
+              </div>
+              <div style="margin-top:12px">
+                <label class="campo" style="margin-top:0">Forma de captura (si ves tirones, prueba otra y compara)</label>
+                <select id="selCaptura" style="width:100%;padding:9px 10px;border-radius:10px;background:var(--panel2);color:inherit;border:1px solid var(--borde2)"></select>
+                <small style="color:var(--tenue)">Se usa desde la próxima conexión. Para AMD suele ir mejor “copia rápida”.</small>
+              </div></details>
+          </section>
         </div>
       </div>
-      <section class="tarjeta">
-        <details id="detActividad" style="margin:0"><summary style="margin:0">Actividad (para encontrar fallas)</summary><div class="log" id="log"></div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
-            <button class="btn sec chico" id="bReprobar">Volver a probar las formas de captura</button>
-            <small style="color:var(--tenue)">Útil después de actualizar drivers o RemotoPC: busca de nuevo la más rápida.</small>
-          </div></details>
-      </section>
     </div>
 
     <div id="modoWeb" class="oculto">
@@ -552,6 +633,9 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
   <video id="video" muted playsinline disablepictureinpicture></video>
   <audio id="sonido" autoplay></audio>
   <div id="capa" tabindex="0"></div>
+  <div id="transfer" class="oculto"></div>
+  <div id="soltar" class="oculto"><div><b>📁 Suelta para enviar a la PC</b><small>Se guarda en su Escritorio</small></div></div>
+  <input type="file" id="selArchivo" multiple class="oculto">
   <div id="burbuja" title="Menú de RemotoPC (puedes arrastrarlo)"><span id="anilloB"></span><span id="caraB"></span></div>
   <div id="barra">
     <div class="pb-cab"><span class="punto" id="bPunto"></span><b id="bNombre">—</b>
@@ -570,9 +654,12 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
       <button class="pbb" id="bReconectar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>Reconectar</span></button>
       <button class="pbb" id="bSonido"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path id="bSonidoOnda" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path id="bSonidoX" d="M22 9l-6 6M16 9l6 6" style="display:none"/></svg><span id="bSonidoTxt">Sonido</span></button>
       <button class="pbb oculto" id="bToque"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6M13 10a2 2 0 0 1 4 0v2M17 11a2 2 0 0 1 4 0v4a7 7 0 0 1-7 7h-1a7 7 0 0 1-6-3.5L4 15a2 2 0 0 1 3.4-2L9 15"/></svg><span id="bToqueTxt">Toque: touchpad</span></button>
+      <button class="pbb oculto" id="bArchivo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M12 18v-6M9 15l3-3 3 3"/></svg><span>Enviar archivo</span></button>
       <button class="pbb rojo" id="bSalir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Desconectar</span></button>
     </div>
     <button class="pbb ancho" id="bMedir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg><span>Medir retraso real</span></button>
+    <button class="pbb ancho oculto" id="bBuscarForma"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Buscar la forma más rápida</span></button>
+    <div class="pb-formas oculto" id="sFormas"></div>
     <div class="menu-b oculto" id="menuTeclas"></div>
     <div class="menu-b oculto" id="menuCalidad"></div>
   </div>
@@ -596,7 +683,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
     <div class="pasos" style="margin:0">
       <div class="paso"><div class="num" style="background:#5eead4">1</div><b>En la PC a controlar</b><small>Pestaña <b>Esta PC</b> → enciende <b>Compartir</b>.</small></div>
       <div class="paso"><div class="num" style="background:#a78bfa">2</div><b>En tu laptop</b><small><b>Mis PCs</b> → <b>Agregar PC</b> con la dirección y contraseña.</small></div>
-      <div class="paso"><div class="num" style="background:#f0abfc">3</div><b>¡Conecta!</b><small>La primera vez, la otra PC te pide aceptar.</small></div>
+      <div class="paso"><div class="num" style="background:#f0abfc">3</div><b>¡Conecta!</b><small>Con la contraseña entras al instante.</small></div>
     </div>
     <h4>Atajos mientras estás conectado</h4>
     <div class="atajos">
@@ -611,7 +698,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
       <li>La <b>burbuja</b> con la carita abre el menú (teclas especiales, calidad, reconectar). Arrástrala a donde no estorbe.</li>
       <li>Conectado, <b>todas las teclas</b> van a la otra PC (Windows, Alt+Tab…).</li>
       <li>Para jugar: <b>cable de red</b> y calidad <b>Alta</b>. Por WiFi, <b>Equilibrado</b>.</li>
-      <li>Marca <b>“Recordar este equipo”</b> y la próxima vez entras sin que pregunten.</li>
+      <li><b>Copiar y pegar</b> funciona entre las dos PCs (texto e imágenes). Para pasar archivos, <b>arrástralos</b> sobre la pantalla de la PC (se guardan en su Escritorio). Si copias archivos en la PC, aparece un botón para <b>traerlos</b>.</li>
       <li>Desde el celular: escanea el <b>QR</b> que aparece en <b>Esta PC</b>.</li>
       <li>¿Un aviso de permiso o una app de administrador te deja atascado? En la otra PC: <b>Esta PC → Control total → Instalar</b>.</li>
     </ul>
@@ -663,6 +750,22 @@ const RESOLUCIONES = {
   p720:  {nombre: "720p",  desc: "el más rápido", alto: 720},
 };
 const esApp = typeof window.rpcCargarConfig === "function";
+
+// La interfaz se adapta a cualquier pantalla: crece en monitores grandes, se
+// achica un poco en las chicas y reacomoda las columnas (3, 2 o 1) para que
+// casi no haya que bajar con el mouse. En celulares queda como siempre.
+function ajustarEscala(){
+  const w = innerWidth, h = innerHeight;
+  let e = 1;
+  if(w >= 900 && h >= 500) e = Math.max(0.9, Math.min(1.45, w / 1280, h / 840));
+  document.documentElement.style.setProperty("--escala", e.toFixed(3));
+  const ef = w / e, ini = $("inicio");
+  ini.classList.toggle("a3", ef >= 1180);
+  ini.classList.toggle("a2", ef >= 800 && ef < 1180);
+  ini.classList.toggle("a1", ef < 800);
+}
+addEventListener("resize", ajustarEscala);
+ajustarEscala();
 // "Nube": la página abierta desde internet (GitHub Pages) o como archivo: se conecta por código.
 let esNube = false;
 let config = {equipos:[]};
@@ -782,7 +885,7 @@ function dibujarLista(){
   cont.style.display = "";
   for(const eq of config.equipos){
     const t = document.createElement("div"); t.className = "pc";
-    const q = CALIDADES[eq.calidad] || CALIDADES.fluido;
+    const q = calidadEfectiva(eq).q;
     const [c1, c2] = colorDe(eq.nombre || eq.dir || eq.codigo);
     const subt = [eq.codigo ? "🌎 " + fmtCodigo(eq.codigo) : "", eq.dir || ""].filter(Boolean).join(" · ");
     t.innerHTML = `
@@ -926,8 +1029,9 @@ async function iniciarWeb(){
 
 // ---------------- Conexión ----------------
 let infoHost = null;
+let formasHost = [], formaHost = "", fpsPedido = 60, capFpsHost = null;
 let pc = null, dc = null, dcMouse = null, cursorRemoto = "default", actual = null, reintento = null, timerStats = null, manual = false;
-let ruta = "local", fallosSeguidos = 0;
+let ruta = "local", fallosSeguidos = 0, iceExtra = [];
 const video = $("video"), capa = $("capa");
 
 function aviso(html, cargando, sub){
@@ -943,20 +1047,31 @@ function limpiar(){
   clearInterval(timerStats); timerStats = null;
   if(dc){ try{ dc.close(); }catch(e){} }
   if(dcMouse){ try{ dcMouse.close(); }catch(e){} }
-  dcMouse = null; capa.style.cursor = "default";
+  if(dcArch){ try{ dcArch.close(); }catch(e){} }
+  dcMouse = null; dcArch = null; detenerArchivos(); capa.style.cursor = "default";
   if(pc){ try{ pc.close(); }catch(e){} }
-  pc = null; dc = null; video.srcObject = null; sonidoEl.srcObject = null; statsSonido = null; saltosSonido = 0; statsPrev = null; sinCuadros = 0; retrasoReal = null;
-  avisarCaptura(false);
+  pc = null; dc = null; video.srcObject = null; sonidoEl.srcObject = null; statsSonido = null; saltosSonido = 0; inicioSonido = 0; statsPrev = null; sinCuadros = 0; retrasoReal = null; ctl = null;
+  avisarCaptura(false); wifiRapido(false);
 }
 
-function esperarICE(p, ms){
+// esperarICE: listo cuando terminó de juntar caminos, o antes si ya hay uno por
+// el router (y uno de relevo si hay relevo): no hace falta esperar a los lentos.
+function esperarICE(p, ms, hayRelevo){
   return new Promise(res => {
     if(p.iceGatheringState === "complete") return res();
-    const t = setTimeout(res, ms);
-    p.addEventListener("icegatheringstatechange", () => { if(p.iceGatheringState === "complete"){ clearTimeout(t); res(); } });
+    const t0 = performance.now(); let router = 0, relevo = 0, temprano = null;
+    const fin = () => { clearTimeout(t); clearTimeout(temprano); res(); };
+    const t = setTimeout(fin, ms);
+    p.addEventListener("icegatheringstatechange", () => { if(p.iceGatheringState === "complete") fin(); });
+    p.addEventListener("icecandidate", e => {
+      const c = e.candidate; if(!c || !c.candidate) return;
+      if(/ typ srflx/.test(c.candidate)) router++;
+      if(/ typ relay/.test(c.candidate)) relevo++;
+      if(router > 0 && (relevo > 0 || !hayRelevo) && !temprano)
+        temprano = setTimeout(fin, Math.max(120, 300 - (performance.now() - t0)));
+    });
   });
 }
-
 // Errores al pedir la conexión. Devuelve true si ya se encargó.
 function tratarError(status, j, nom){
   if(status === 200) return false;
@@ -973,6 +1088,12 @@ function tratarError(status, j, nom){
 async function elegirRuta(eq){
   if(eq.web || !eq.codigo || !puedeInternet()) return "local";
   if(!puedeRedLocal()) return "internet";
+  if(eq.dir && eq.ultimaRuta === "internet"){
+    // La última vez fue por internet: no esperar. Se mira la red local de
+    // fondo y, si la PC aparece ahí, la próxima vez se va directo por ahí.
+    enMiRed(eq, 1200).then(ok => { if(ok){ eq.ultimaRuta = "local"; guardarConfig(); } });
+    return "internet";
+  }
   if(eq.dir && await enMiRed(eq, 1200)) return "local";
   return "internet";
 }
@@ -994,7 +1115,7 @@ async function conectar(eq){
   $("inicio").classList.add("oculto"); $("visor").classList.remove("oculto");
   const nom = escapar(eq.nombre || eq.dir || "la PC");
   estado(eq.nombre || "PC", ""); aviso("Conectando a <b>" + nom + "</b>…", true);
-  const q = CALIDADES[eq.calidad] || CALIDADES.fluido;
+  const {q, alto: altoPedido} = calidadEfectiva(eq);
 
   const miRuta = await elegirRuta(eq);
   if(actual !== eq || manual) return;
@@ -1004,24 +1125,32 @@ async function conectar(eq){
     // Paso 1: pedir permiso (si nadie responde en la PC, se espera unos segundos).
     // Recién después se prepara la conexión, para que no "venza" mientras tanto.
     const avisoP = setTimeout(() => {
-      if(actual === eq && !manual) aviso("Esperando que acepten en <b>" + nom + "</b>…", true, "Si nadie responde, entrarás en unos segundos con tu contraseña.");
+      if(actual === eq && !manual) aviso("Buscando a <b>" + nom + "</b> por internet…", true, "Esto tarda un poquito más con internet lento.");
     }, 3500);
     const per = await pedirInternet("permiso", eq.codigo, eq.clave || "", {equipo: await miEquipo()});
     clearTimeout(avisoP);
     if(actual !== eq || manual) return;
     if(tratarError(per.status, per.j || {}, nom)) return;
+    iceExtra = (per.j && per.j.ice) || [];
     aviso("Conectando a <b>" + nom + "</b>…", true, "Abriendo camino directo por internet…");
   }
-  const ice = ruta === "internet" ? await servidoresICE() : [];
+  const ice = ruta === "internet" ? (await servidoresICE()).concat(iceExtra) : [];
   if(actual !== eq || manual) return;
-  const miPc = new RTCPeerConnection({iceServers: ice});
+  const miPc = new RTCPeerConnection(window.__soloRelevo ? {iceServers: ice, iceTransportPolicy: "relay"} : {iceServers: ice});
   pc = miPc;
   const tr = miPc.addTransceiver("video", {direction: "recvonly"});
+  // H.265 si esta laptop lo decodifica por hardware (imagen más nítida con los
+  // mismos Mbps); si no, H.264 como siempre. La PC elige según lo que pueda.
+  let quiereH265 = false;
   try{
     const caps = RTCRtpReceiver.getCapabilities("video").codecs;
-    const h264 = caps.filter(c => c.mimeType === "video/H264");
-    if(h264.length && tr.setCodecPreferences) tr.setCodecPreferences(h264.concat(caps.filter(c => c.mimeType !== "video/H264")));
-  }catch(e){}
+    const h265 = caps.filter(c => c.mimeType === "video/H265"), h264 = caps.filter(c => c.mimeType === "video/H264");
+    // H.265 solo si lo encendiste a mano: en algunas laptops el navegador se
+    // cae al recibirlo (es experimental en WebRTC) y H.264 tiene menos retraso.
+    quiereH265 = h265.length > 0 && config.codec === "h265" && !sinH265;
+    const orden = (quiereH265 ? h265 : []).concat(h264);
+    if(orden.length && tr.setCodecPreferences) tr.setCodecPreferences(orden.concat(caps.filter(c => !orden.includes(c))));
+  }catch(e){ quiereH265 = false; }
   // Sonido de la PC (pista aparte del video).
   try{ miPc.addTransceiver("audio", {direction: "recvonly"}); }catch(e){}
   const miDc = miPc.createDataChannel("input", {ordered: true});
@@ -1029,11 +1158,21 @@ async function conectar(eq){
   // Canal rápido para mover el mouse: sin esperas ni reenvíos.
   const miDcMouse = miPc.createDataChannel("mouse", {ordered: false, maxRetransmits: 0});
   dcMouse = miDcMouse;
-  miDc.onopen = () => { if(pc === miPc){ avisarCaptura(true); avisarOyendo(); } };
+  // Canal para imágenes del portapapeles y archivos (en orden y sin perder nada).
+  const miDcArch = miPc.createDataChannel("archivos", {ordered: true});
+  dcArch = miDcArch; prepararArchivos(miDcArch);
+  miDc.onopen = () => { if(pc === miPc){ avisarCaptura(true); avisarOyendo(); iniciarPortapapeles(); } };
   miDc.onmessage = ev => {
     let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
-    if(m.t === "info"){ codificador = m.codificador; if(m.nombre) estado(m.nombre, "si"); if(m.pantalla) infoHost = {pantalla: m.pantalla, marca: m.marca || 48}; }
-    if(m.t === "cursor"){ cursorRemoto = m.c; if(!bloqueado()) capa.style.cursor = m.c; }
+    if(m.t === "info"){ codificador = m.codificador; if(m.nombre) estado(m.nombre, "si"); if(m.pantalla) infoHost = {pantalla: m.pantalla, marca: m.marca || 48};
+      funcionesHost = m.funciones || []; $("bArchivo").classList.toggle("oculto", !funcionesHost.includes("archivos"));
+      formasHost = m.formas || []; formaHost = m.forma || ""; $("bBuscarForma").classList.toggle("oculto", !funcionesHost.includes("formas") || formasHost.length < 2); }
+    if(m.t === "forma") respuestaForma(m);
+    if(m.t === "cap") capFpsHost = m.fps;
+    if(m.t === "clip") recibirClipTexto(m.texto);
+    if(m.t === "reconectar" && pc === miPc){ if(m.motivo === "h264") sinH265 = true; reconectarYa(); }
+    if(m.t === "cursor"){ cursorRemoto = m.c; if(!bloqueado()) capa.style.cursor = m.c; pintarCursorT(); }
+    if(m.t === "pos"){ posRemota = {x: m.x, y: m.y}; pintarCursorT(); }
     if(m.t === "cerrado" && pc === miPc){
       if(document.pointerLockElement) document.exitPointerLock();
       salirPantallaCompleta();
@@ -1053,7 +1192,11 @@ async function conectar(eq){
     try{ r.playoutDelayHint = 0; }catch(e){}
     video.srcObject = ev.streams[0] || new MediaStream([ev.track]);
     video.play().catch(() => {});
-    if(video.requestVideoFrameCallback) video.requestVideoFrameCallback(() => primerCuadro());
+    if(video.requestVideoFrameCallback){
+      video.requestVideoFrameCallback(() => primerCuadro());
+      const cada = (ahora, meta) => { if(pc !== miPc) return; cuadroLlego(meta); if(fluidez) fluidez.push(ahora); video.requestVideoFrameCallback(cada); };
+      video.requestVideoFrameCallback(cada);
+    }
   };
   let llegoRespuesta = false;
   miPc.onconnectionstatechange = () => {
@@ -1069,8 +1212,8 @@ async function conectar(eq){
       // La PC contestó pero no hubo camino directo entre las dos redes.
       fallosSeguidos++;
       if(fallosSeguidos >= 3) errorFatal("No se pudo abrir un camino directo por internet.",
-        "La PC respondió, pero las dos redes no se dejan conectar directamente (pasa con algunas redes de celular o de empresa). " +
-        "Prueba con otra red (por ejemplo, el WiFi o compartir datos del celular) o instala <b>Tailscale</b> en los dos equipos: RemotoPC lo usa solo.", true);
+        "La PC respondió, pero las dos redes no se dejan conectar directamente (pasa con algunas redes de datos móviles o de empresa). " +
+        (iceExtra.length ? "Ni siquiera por el relevo: prueba otra red." : "Solución: en la PC principal, “Esta PC” → <b>Relevo para redes difíciles</b> (Cloudflare, gratis)."), true);
       else { aviso("Probando otro camino…", true, "Intento " + fallosSeguidos + " de 3"); programarReintento(2500); }
     }
     else if(s === "failed" || s === "disconnected" || s === "closed"){ estado("Reconectando…", "no"); programarReintento(); }
@@ -1078,23 +1221,24 @@ async function conectar(eq){
   let mostrado = false;
   const primerCuadro = () => {
     if(pc !== miPc || mostrado) return;
-    mostrado = true; fallosSeguidos = 0; aviso(null); capa.focus();
+    mostrado = true; fallosSeguidos = 0; aviso(null); capa.focus(); wifiRapido(true);
     if(!config.pistaBurbuja){ mostrarPista('Toca la <b>burbuja</b> de arriba para el menú · puedes arrastrarla a donde quieras', 4500); config.pistaBurbuja = true; guardarConfig(); }
-    if(!eq.web){ eq.ultima = Date.now(); guardarConfig(); }
+    if(!eq.web){ eq.ultima = Date.now(); eq.ultimaRuta = ruta; guardarConfig(); }
   };
   video.onplaying = primerCuadro;
   video.onloadeddata = primerCuadro;
 
   try{
     await miPc.setLocalDescription(await miPc.createOffer());
-    await esperarICE(miPc, ruta === "internet" ? 3000 : 2000);
+    await esperarICE(miPc, ruta === "internet" ? 3000 : 2000, ruta === "internet" && ice.some(s => [].concat(s.urls || []).some(u => /^turns?:/.test(u))));
     if(pc !== miPc) return;
     const yo = await miEquipo();
     const avisoEspera = setTimeout(() => {
-      if(pc === miPc) aviso("Esperando que acepten en <b>" + nom + "</b>…", true, "Si nadie responde, entrarás en unos segundos con tu contraseña.");
+      if(pc === miPc) aviso("Conectando a <b>" + nom + "</b>…", true, "Esto tarda un poquito más con internet lento.");
     }, ruta === "internet" ? 3500 : 1200);
-    const pedido = {audio: true, sdp: miPc.localDescription.sdp, fps: q.fps, mbps: q.mbps,
-      alto: (RESOLUCIONES[eq.resolucion] || RESOLUCIONES.nativa).alto, equipo: yo};
+    fpsPedido = q.fps;
+    const pedido = {audio: true, h265: quiereH265, sdp: miPc.localDescription.sdp, fps: q.fps, mbps: q.mbps, kbps: iniciarControl(q),
+      alto: altoPedido, equipo: yo};
     let r, j;
     try{
       if(ruta === "internet"){
@@ -1159,8 +1303,280 @@ function desconectar(){
 
 function reconectarYa(){ if(actual){ cerrarMenus(); toast("Reconectando…"); conectar(actual); } }
 
+// ---------------- Calidad automática ----------------
+// Mide cuánto tarda en llegar cada cuadro comparado con el mejor caso reciente.
+// Si ese tiempo crece (la red se está atorando) o se pierden paquetes, baja los
+// Mbps ANTES de que se acumule retraso. Cuando todo va bien un rato, prueba
+// subir de a poco. La PC cambia de calidad sin cortar la imagen.
+let ctl = null;
+function iniciarControl(q){
+  const max = q.mbps * 1000, activo = config.calidadAuto !== false;
+  // Se empieza en la calidad elegida: solo baja si la red de verdad no da.
+  const inicio = max;
+  ctl = {activo, max, actual: inicio, min: Math.min(2000, max), muestras: [], minimos: [], ultimaD: null,
+    cambio: performance.now(), subida: -Infinity, previo: 0, techo: Infinity, techoHasta: 0, malos: 0, bien: 0, cola: null};
+  return inicio;
+}
+function cuadroLlego(meta){
+  if(!ctl || !meta || meta.rtpTimestamp == null || meta.receiveTime == null) return;
+  const d = meta.receiveTime - meta.rtpTimestamp / 90;
+  // Salto enorme (la marca de tiempo dio la vuelta): empezar la cuenta de nuevo.
+  if(ctl.ultimaD != null && Math.abs(d - ctl.ultimaD) > 600000){ ctl.minimos = []; ctl.muestras = []; }
+  ctl.ultimaD = d;
+  ctl.muestras.push(d);
+}
+// Versión web (la página de GitHub en un navegador): máximo 720p, 30 FPS y
+// 8 Mbps, para que vaya liviana en cualquier navegador y conexión.
+const WEB_MAX = {fps: 30, mbps: 8, alto: 720};
+const CALIDADES_WEB = {
+  fluido:      {nombre: "Fluido",      desc: "30 FPS · 8 Mbps · buena conexión", fps: 30, mbps: 8},
+  equilibrado: {nombre: "Equilibrado", desc: "30 FPS · 5 Mbps · WiFi",           fps: 30, mbps: 5},
+  ahorro:      {nombre: "Ahorro",      desc: "30 FPS · 3 Mbps · internet lento", fps: 30, mbps: 3},
+};
+const calidadesMenu = () => esNube ? CALIDADES_WEB : CALIDADES;
+function calidadEfectiva(eq){
+  let alto = (RESOLUCIONES[eq.resolucion] || RESOLUCIONES.nativa).alto;
+  if(!esNube) return {q: CALIDADES[eq.calidad] || CALIDADES.fluido, alto};
+  if(!alto || alto > WEB_MAX.alto) alto = WEB_MAX.alto;
+  return {q: CALIDADES_WEB[eq.calidad] || CALIDADES_WEB.fluido, alto};
+}
+// aplicarEnVivo: la PC cambia calidad/resolución sin cortar (desde v0.31).
+// Devuelve false si hay que reconectar (PC más vieja o sin conexión).
+function aplicarEnVivo(){
+  if(!actual || !pc || pc.connectionState !== "connected" || !dc || dc.readyState !== "open" || !funcionesHost.includes("ajustes")) return false;
+  const {q, alto} = calidadEfectiva(actual);
+  fpsPedido = q.fps; capFpsHost = null;
+  iniciarControl(q);
+  enviar(["ajustes", q.fps, q.mbps, alto]);
+  return true;
+}
+function pedirTasa(k, porque){
+  k = Math.round(Math.max(ctl.min, Math.min(ctl.max, k)) / 100) * 100;
+  if(k === ctl.actual) return;
+  diag.ultimoAjuste = `${(ctl.actual/1000).toFixed(1)}→${(k/1000).toFixed(1)} Mbps (${porque})`;
+  ctl.actual = k; ctl.cambio = performance.now(); ctl.malos = 0; ctl.bien = 0;
+  enviar(["tasa", k]);
+}
+function controlar(perdidosPct){
+  if(!ctl) return;
+  const s = ctl.muestras; ctl.muestras = [];
+  if(s.length < 5) return; // pantalla quieta: no hay con qué medir
+  let suma = 0, mn = Infinity;
+  for(const x of s){ suma += x; if(x < mn) mn = x; }
+  ctl.minimos.push(mn); if(ctl.minimos.length > 30) ctl.minimos.shift();
+  const base = Math.min(...ctl.minimos);
+  ctl.cola = suma / s.length - base;
+  if(!ctl.activo || buscandoForma) return; // el buscador compara formas con la misma calidad
+  const ahora = performance.now(), desdeCambio = ahora - ctl.cambio;
+  // Un tirón suelto del WiFi no es "red atorada": hacen falta 3 segundos
+  // seguidos malos. Cada cambio cuesta un instante de trabajo extra en la PC,
+  // así que se cambia poco.
+  const malo = ctl.cola > 70 || perdidosPct > 4;
+  if(malo){ ctl.malos++; ctl.bien = 0; } else { ctl.malos = 0; ctl.bien++; }
+  if(ctl.malos >= 3 && desdeCambio > 5000 && ctl.actual > ctl.min){
+    // Si justo veníamos de subir, ese era el límite: no volver a pasarlo por un buen rato.
+    if(ahora - ctl.subida < 30000 && ctl.previo){ ctl.techo = ctl.previo; ctl.techoHasta = ahora + 180000; }
+    pedirTasa(ctl.actual * (perdidosPct > 10 ? 0.55 : 0.75), perdidosPct > 4 ? "pérdidas " + perdidosPct.toFixed(0) + "%" : "cola " + ctl.cola.toFixed(0) + " ms");
+  } else if(ctl.bien >= 20 && desdeCambio > 20000 && ctl.actual < ctl.max){
+    let k = Math.min(ctl.max, ctl.actual * 1.3);
+    if(ahora < ctl.techoHasta) k = Math.min(k, ctl.techo);
+    if(k > ctl.actual * 1.08){ ctl.previo = ctl.actual; ctl.subida = ahora; pedirTasa(k, "red estable"); }
+  }
+}
+// En la app de Windows: el WiFi de esta laptop en modo streaming mientras dure la conexión.
+let wifiOn = false;
+function wifiRapido(on){
+  if(on === wifiOn || !esApp || !window.rpcWifiRapido) return;
+  wifiOn = on; window.rpcWifiRapido(on).catch(() => {});
+}
+
+// ---------------- Portapapeles compartido y archivos ----------------
+// Texto: lo que copias en un lado queda listo para pegar en el otro.
+// Imágenes y archivos: por el canal "archivos", en pedazos de 16 KB.
+let sinH265 = false; // la PC no pudo con H.265: hasta cerrar la app, H.264
+let dcArch = null, funcionesHost = [], clipTimer = null, clipUltimo = null, clipPendiente = null;
+let colaEnvio = [], enviando = null, recibiendo = null, ofrecido = null, sigIdArch = 1000000;
+
+function iniciarPortapapeles(){
+  clearInterval(clipTimer); clipTimer = null; clipUltimo = null;
+  if(esApp && window.rpcPortapapeles){
+    window.rpcPortapapeles(true).catch(() => {});
+    clipTimer = setInterval(revisarPortapapeles, 400);
+  }
+}
+async function revisarPortapapeles(){
+  if(!dc || dc.readyState !== "open") return;
+  if(esApp && window.rpcPortapapeles){
+    let r = "";
+    try{ r = await window.rpcPortapapeles(false); }catch(e){ return; }
+    if(!r) return;
+    let c; try{ c = JSON.parse(r); }catch(e){ return; }
+    if(c.tipo === "texto" && c.texto !== clipUltimo){ clipUltimo = c.texto; enviar(["clip", c.texto]); }
+    else if(c.tipo === "imagen" && c.png && funcionesHost.includes("archivos"))
+      encolarEnvio({tipo: "clip-img", nombre: "imagen.png", blob: new Blob([b64aBytes(c.png)], {type: "image/png"})});
+    return;
+  }
+  // En el navegador: al volver a esta pestaña (Chrome pide permiso una sola vez).
+  if(clipPendiente != null){ try{ await navigator.clipboard.writeText(clipPendiente); clipPendiente = null; }catch(e){} }
+  try{
+    if(!navigator.clipboard || !navigator.clipboard.readText || !document.hasFocus()) return;
+    const t = await navigator.clipboard.readText();
+    if(t && t !== clipUltimo){ clipUltimo = t; enviar(["clip", t]); }
+  }catch(e){}
+}
+async function recibirClipTexto(t){
+  if(typeof t !== "string") return;
+  clipUltimo = t;
+  if(esApp && window.rpcPonerTexto){ window.rpcPonerTexto(t).catch(() => {}); }
+  else { try{ await navigator.clipboard.writeText(t); }catch(e){ clipPendiente = t; } }
+  toast("📋 Copiado desde la PC");
+}
+function b64aBytes(b64){ const s = atob(b64), u = new Uint8Array(s.length); for(let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+function blobAB64(blob){ return new Promise(res => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1] || ""); r.readAsDataURL(blob); }); }
+function tamTxt(n){ return n >= 1073741824 ? (n / 1073741824).toFixed(2) + " GB" : n >= 1048576 ? (n / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB"; }
+
+function prepararArchivos(ch){
+  ch.binaryType = "arraybuffer";
+  ch.bufferedAmountLowThreshold = 1 << 20;
+  ch.onmessage = ev => {
+    if(typeof ev.data !== "string"){
+      if(recibiendo){ recibiendo.partes.push(ev.data); recibiendo.recibido += ev.data.byteLength; pintarTransfer(); }
+      return;
+    }
+    let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
+    if(m.t === "ini"){ recibiendo = {id: m.id, nombre: m.nombre, tam: m.tam, tipo: m.tipo, partes: [], recibido: 0, inicio: performance.now()}; pintarTransfer(); }
+    else if(m.t === "fin" && recibiendo && recibiendo.id === m.id){ const r = recibiendo; recibiendo = null; terminarRecepcion(r); pintarTransfer(); }
+    else if(m.t === "cancelar"){
+      if(recibiendo && recibiendo.id === m.id) recibiendo = null;
+      if(enviando && enviando.id === m.id) enviando.cancelado = true;
+      if(m.error) toast(m.error);
+      pintarTransfer();
+    }
+    else if(m.t === "guardado") toast("✓ " + m.nombre + " guardado en " + (m.donde || "la PC"));
+    else if(m.t === "ofrecer"){ ofrecido = m; pintarTransfer(); }
+  };
+}
+function detenerArchivos(){
+  clearInterval(clipTimer); clipTimer = null;
+  if(enviando) enviando.cancelado = true;
+  colaEnvio = []; recibiendo = null; ofrecido = null; pintarTransfer();
+}
+async function terminarRecepcion(r){
+  const blob = new Blob(r.partes, r.tipo === "clip-img" ? {type: "image/png"} : {});
+  if(r.tipo === "clip-img"){
+    if(esApp && window.rpcPonerImagen) window.rpcPonerImagen(await blobAB64(blob)).catch(() => {});
+    else { try{ await navigator.clipboard.write([new ClipboardItem({"image/png": blob})]); }catch(e){} }
+    toast("📋 Imagen copiada desde la PC");
+    return;
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = r.nombre || "archivo";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 120000);
+  toast("⬇ " + r.nombre + " → Descargas");
+}
+
+function enviarArchivos(files, entradas){
+  if(!dcArch || dcArch.readyState !== "open" || !funcionesHost.includes("archivos")){ toast("Esa PC necesita RemotoPC 0.23 o más nuevo para recibir archivos"); return; }
+  for(let i = 0; i < files.length; i++){
+    if(entradas && entradas[i] && entradas[i].isDirectory){ toast("Carpetas: comprímela en .zip y suéltala"); continue; }
+    encolarEnvio({tipo: "archivo", nombre: files[i].name, blob: files[i]});
+  }
+}
+function encolarEnvio(x){ colaEnvio.push(x); if(!enviando) procesarCola(); pintarTransfer(); }
+function esperarBajo(ch){
+  return new Promise(res => {
+    const f = () => { ch.removeEventListener("bufferedamountlow", f); clearTimeout(t); res(); };
+    const t = setTimeout(f, 300);
+    ch.addEventListener("bufferedamountlow", f);
+  });
+}
+async function procesarCola(){
+  while(colaEnvio.length){
+    const x = colaEnvio.shift(), ch = dcArch;
+    if(!ch || ch.readyState !== "open"){ colaEnvio = []; break; }
+    const e = enviando = {id: ++sigIdArch, nombre: x.nombre, tam: x.blob.size, tipo: x.tipo, enviado: 0, inicio: performance.now(), cancelado: false};
+    try{
+      ch.send(JSON.stringify({t: "ini", id: e.id, nombre: x.nombre, tam: x.blob.size, tipo: x.tipo}));
+      const PASO = 16384, BLOQUE = 1 << 20;
+      for(let off = 0; off < x.blob.size && !e.cancelado; off += BLOQUE){
+        const buf = await x.blob.slice(off, off + BLOQUE).arrayBuffer();
+        for(let i = 0; i < buf.byteLength && !e.cancelado; i += PASO){
+          while(ch.bufferedAmount > (4 << 20) && ch.readyState === "open") await esperarBajo(ch);
+          if(ch.readyState !== "open"){ e.cancelado = true; break; }
+          ch.send(buf.slice(i, i + PASO));
+          e.enviado += Math.min(PASO, buf.byteLength - i);
+        }
+        pintarTransfer();
+      }
+      if(e.cancelado){ if(ch.readyState === "open") ch.send(JSON.stringify({t: "cancelar", id: e.id})); }
+      else ch.send(JSON.stringify({t: "fin", id: e.id}));
+    }catch(err){ toast("No se pudo enviar " + x.nombre); }
+  }
+  enviando = null; pintarTransfer();
+}
+
+let pintandoTf = false;
+function pintarTransfer(){
+  if(pintandoTf) return;
+  pintandoTf = true;
+  requestAnimationFrame(() => {
+    pintandoTf = false;
+    const el = $("transfer"), partes = [];
+    const fila = (flecha, x, hecho, cancelar) => {
+      const seg = (performance.now() - x.inicio) / 1000, vel = seg > 0.3 ? hecho / seg : 0;
+      const pct = x.tam > 0 ? Math.min(100, hecho / x.tam * 100) : 0;
+      return `<div class="tf"><div class="tf-cab"><span>${flecha}</span><b>${escapar(x.nombre)}</b><button data-tf="${cancelar}" title="Cancelar">✕</button></div>
+        <div class="tf-barra"><div style="width:${x.tam > 0 ? pct.toFixed(1) : 100}%"></div></div>
+        <small>${x.tam > 0 ? pct.toFixed(0) + "% de " + tamTxt(x.tam) : tamTxt(hecho)}${vel ? " · " + tamTxt(vel) + "/s" : ""}${flecha === "⬆" && colaEnvio.length ? " · " + colaEnvio.length + " más en cola" : ""}</small></div>`;
+    };
+    if(enviando && enviando.tipo !== "clip-img") partes.push(fila("⬆", enviando, enviando.enviado, "env"));
+    if(recibiendo && recibiendo.tipo !== "clip-img") partes.push(fila("⬇", recibiendo, recibiendo.recibido, "rec"));
+    if(ofrecido){
+      const que = ofrecido.n === 1 ? "<b>" + escapar(ofrecido.nombres[0]) + "</b>" : ofrecido.n + " archivos";
+      partes.push(`<div class="tf"><div class="tf-cab"><span>📋</span><b style="white-space:normal;font-weight:500">Copiaste ${que} en la PC${ofrecido.tam ? " (" + tamTxt(ofrecido.tam) + ")" : ""}</b><button data-tf="no" title="Cerrar">✕</button></div>
+        <div class="tf-acc"><button class="btn chico" data-tf="traer">⬇ Traer aquí</button></div></div>`);
+    }
+    el.innerHTML = partes.join("");
+    el.classList.toggle("oculto", !partes.length);
+  });
+}
+$("transfer").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-tf]"); if(!b) return;
+  ev.stopPropagation();
+  const k = b.dataset.tf;
+  if(k === "env" && enviando){ enviando.cancelado = true; colaEnvio = []; }
+  if(k === "rec" && recibiendo){ try{ dcArch.send(JSON.stringify({t: "cancelar", id: recibiendo.id})); }catch(e){} recibiendo = null; }
+  if(k === "traer" && dcArch && dcArch.readyState === "open"){ dcArch.send(JSON.stringify({t: "traer"})); ofrecido = null; }
+  if(k === "no") ofrecido = null;
+  pintarTransfer(); capa.focus();
+});
+["mousedown", "pointerdown", "touchstart", "wheel"].forEach(t => $("transfer").addEventListener(t, ev => ev.stopPropagation()));
+
+// Arrastrar y soltar archivos sobre la pantalla de la PC.
+{
+  let arrastres = 0;
+  const hayArchivos = e => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files");
+  const v = $("visor");
+  v.addEventListener("dragenter", e => { if(!hayArchivos(e) || !pc) return; e.preventDefault(); arrastres++; $("soltar").classList.remove("oculto"); });
+  v.addEventListener("dragover", e => { if(!hayArchivos(e) || !pc) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; });
+  v.addEventListener("dragleave", e => { if(!hayArchivos(e)) return; if(--arrastres <= 0){ arrastres = 0; $("soltar").classList.add("oculto"); } });
+  v.addEventListener("drop", e => {
+    if(!hayArchivos(e)) return;
+    e.preventDefault(); arrastres = 0; $("soltar").classList.add("oculto");
+    const items = e.dataTransfer.items, entradas = [];
+    if(items) for(let i = 0; i < items.length; i++) entradas.push(items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null);
+    enviarArchivos(e.dataTransfer.files, entradas);
+  });
+  // Afuera del visor, soltar un archivo no debe abrirlo en la ventana.
+  window.addEventListener("dragover", e => e.preventDefault());
+  window.addEventListener("drop", e => e.preventDefault());
+}
+window.addEventListener("focus", () => { if(pc) revisarPortapapeles(); });
+
 // ---------------- Estadísticas y vigilante ----------------
-let statsPrev = null, codificador = "", sinCuadros = 0, statsSonido = null, saltosSonido = 0;
+let videoCodec = "";
+let statsPrev = null, codificador = "", sinCuadros = 0, statsSonido = null, saltosSonido = 0, inicioSonido = 0;
 async function actualizarStats(){
   if(!pc) return;
   let inb = null, par = null;
@@ -1172,6 +1588,10 @@ async function actualizarStats(){
   if(!inb) return;
   const t = performance.now();
   $("sFps").textContent = (inb.framesPerSecond || 0).toFixed(0);
+  // Si la PC compartida misma no llega (un juego pesado en su gráfica), decirlo:
+  // la otra PC no puede mostrar más cuadros de los que esa PC dibuja.
+  const fpsLbl = $("sFps").nextElementSibling;
+  if(fpsLbl) fpsLbl.textContent = capFpsHost != null && capFpsHost < fpsPedido * 0.85 ? `FPS · la PC da ${capFpsHost}` : "FPS";
   {
     const fps = inb.framesPerSecond || 0, ping = par && par.currentRoundTripTime != null ? par.currentRoundTripTime * 1000 : 0;
     $("anilloB").className = fps >= 45 && ping < 40 ? "bien" : fps >= 20 && ping < 120 ? "regular" : "mal";
@@ -1194,12 +1614,20 @@ async function actualizarStats(){
     }
     const perd = (inb.packetsLost || 0) - statsPrev.lost;
     if(perd > 0) det.push(perd + " paquetes perdidos");
+    const recib = (inb.packetsReceived || 0) - (statsPrev.rec || 0);
+    controlar(recib + perd > 0 ? perd * 100 / (recib + perd) : 0);
+    if(ctl && ctl.activo) det.push(`calidad auto ${(ctl.actual / 1000).toFixed(1)} de ${ctl.max / 1000} Mbps` + (ctl.cola != null ? ` · cola ${ctl.cola.toFixed(0)} ms` : ""));
     // Vigilante: si la ventana está visible y no llegan cuadros, reanudar o reconectar.
     if(!document.hidden && pc.connectionState === "connected"){
       sinCuadros = fd > 0 ? 0 : sinCuadros + 1;
       if(video.paused && video.srcObject) video.play().catch(() => {});
       if(sinCuadros >= 6){ sinCuadros = 0; reconectarYa(); return; }
     } else sinCuadros = 0;
+  }
+  {
+    const cod = inb.codecId && rep.get(inb.codecId);
+    videoCodec = cod && cod.mimeType ? (/265/.test(cod.mimeType) ? "H.265" : /264/.test(cod.mimeType) ? "H.264" : cod.mimeType.replace("video/", "")) : "";
+    if(videoCodec) det.push(videoCodec);
   }
   if(inb.frameWidth) det.push(inb.frameWidth + "×" + inb.frameHeight);
   // Sonido: si al empezar quedó audio acumulado (el reproductor tardó en arrancar),
@@ -1210,20 +1638,26 @@ async function actualizarStats(){
     const sa = statsSonido;
     if(sa && aud.jitterBufferEmittedCount > sa.em){
       const prom = (aud.jitterBufferDelay - sa.jb) / (aud.jitterBufferEmittedCount - sa.em) * 1000;
-      if(prom > 140 && saltosSonido < 3){ saltosSonido++; enviar(["saltar", Math.min(1000, Math.round(prom - 50))]); }
+      if(!inicioSonido) inicioSonido = Date.now();
+      // Solo al empezar (el reproductor tardó en arrancar): después, saltar corta el sonido.
+      if(prom > 250 && saltosSonido < 1 && Date.now() - inicioSonido < 8000){ saltosSonido++; enviar(["saltar", Math.min(1000, Math.round(prom - 60))]); }
       det.push("sonido " + prom.toFixed(0) + " ms");
     }
     statsSonido = {em: aud.jitterBufferEmittedCount, jb: aud.jitterBufferDelay};
   }
   if(par){
-    let tipo = "";
-    rep.forEach(x => { if(x.id === par.remoteCandidateId) tipo = x.candidateType; if(x.id === par.localCandidateId && x.candidateType === "relay") tipo = "relay"; });
+    let tipo = "", relevo = false;
+    rep.forEach(x => {
+      if(x.id === par.remoteCandidateId){ tipo = x.candidateType; if(x.candidateType === "relay") relevo = true; }
+      if(x.id === par.localCandidateId && x.candidateType === "relay") relevo = true;
+    });
+    if(relevo) tipo = "relay";
     det.push(ruta === "internet" ? (tipo === "relay" ? "por internet (relevo)" : tipo === "host" ? "por internet → misma red" : "por internet, directo") : "en tu red");
   }
   if(codificador) det.push("captura: " + codificador);
   $("bStats").title = det.join(" · ");
   statsPrev = {t, bytes: inb.bytesReceived, em: inb.jitterBufferEmittedCount || 0, jb: inb.jitterBufferDelay || 0,
-    fd: inb.framesDecoded || 0, dec: inb.totalDecodeTime || 0, lost: inb.packetsLost || 0, proc: inb.totalProcessingDelay || 0};
+    fd: inb.framesDecoded || 0, dec: inb.totalDecodeTime || 0, lost: inb.packetsLost || 0, rec: inb.packetsReceived || 0, proc: inb.totalProcessingDelay || 0};
 }
 
 document.addEventListener("visibilitychange", () => { if(document.hidden) enviar(["x"]); else window.__alVolver(); });
@@ -1380,25 +1814,54 @@ function dibujarMenuCalidad(){
   const m = $("menuCalidad"); m.innerHTML = '<div class="tit">Calidad</div>';
   const guardarYReconectar = async (msg) => {
     if(actual.web){ config.calidad = actual.calidad; config.resolucion = actual.resolucion; }
-    await guardarConfig(); cerrarMenus(); toast(msg); conectar(actual);
+    await guardarConfig(); cerrarMenus();
+    if(aplicarEnVivo()) toast(msg);
+    else { toast(msg); conectar(actual); }
   };
-  for(const [k, v] of Object.entries(CALIDADES)){
+  if(esNube) m.insertAdjacentHTML("beforeend", '<div class="nota-web">Versión web: hasta 720p y 30 FPS. Para más calidad, usa la app RemotoPC.</div>');
+  for(const [k, v] of Object.entries(calidadesMenu())){
     const b = document.createElement("button");
-    if(actual && (actual.calidad || "fluido") === k) b.className = "sel";
+    const elegida = esNube ? (CALIDADES_WEB[actual && actual.calidad] ? actual.calidad : "fluido") : (actual && actual.calidad) || "fluido";
+    if(elegida === k) b.className = "sel";
     b.innerHTML = `<span>${v.nombre}</span><small>${v.desc}</small>`;
     b.onclick = () => { actual.calidad = k; guardarYReconectar("Calidad: " + v.nombre); };
     m.appendChild(b);
   }
+  {
+    const b = document.createElement("button");
+    const on = config.calidadAuto !== false;
+    if(on) b.className = "sel";
+    b.innerHTML = `<span>Automática ${on ? "✓" : ""}</span><small>${on ? "baja los Mbps si la red se satura, para que no haya retraso" : "apagada: siempre los Mbps elegidos"}</small>`;
+    b.onclick = async () => {
+      config.calidadAuto = !on; await guardarConfig(); cerrarMenus(); toast("Calidad automática " + (on ? "apagada" : "encendida"));
+      // No hace falta reconectar: solo se prende o apaga el control aquí.
+      if(ctl && pc && pc.connectionState === "connected"){
+        ctl.activo = !on;
+        if(on && ctl.actual !== ctl.max){ ctl.actual = ctl.max; enviar(["tasa", ctl.max]); }
+      } else conectar(actual);
+    };
+    m.appendChild(b);
+  }
+  if(!esNube){
+    const b = document.createElement("button");
+    const on = config.codec === "h265";
+    if(on) b.className = "sel";
+    b.innerHTML = `<span>H.265 (experimental) ${on ? "✓" : ""}</span><small>${on ? (videoCodec === "H.265" ? "en uso: más nítido, pero puede cerrar la ventana en algunas PCs" : "se usa si las dos PCs pueden") : "apagado: H.264, el más rápido y estable"}</small>`;
+    b.onclick = async () => { config.codec = on ? "h264" : "h265"; await guardarConfig(); cerrarMenus(); toast("H.265 " + (on ? "apagado" : "encendido")); conectar(actual); };
+    m.appendChild(b);
+  }
   m.insertAdjacentHTML("beforeend", '<div class="tit" style="margin-top:6px">Resolución</div>');
   for(const [k, v] of Object.entries(RESOLUCIONES)){
+    if(esNube && !(v.alto && v.alto <= WEB_MAX.alto)) continue; // web: hasta 720p
     const b = document.createElement("button");
-    if(actual && (actual.resolucion || "nativa") === k) b.className = "sel";
+    const sel = esNube ? (actual && calidadEfectiva(actual).alto === v.alto) : (actual && (actual.resolucion || "nativa") === k);
+    if(sel) b.className = "sel";
     b.innerHTML = `<span>${v.nombre}</span><small>${v.desc}</small>`;
     b.onclick = () => { actual.resolucion = k; guardarYReconectar("Resolución: " + v.nombre); };
     m.appendChild(b);
   }
 }
-function cerrarMenus(){ $("menuTeclas").classList.add("oculto"); $("menuCalidad").classList.add("oculto"); $("bTeclas").classList.remove("on"); $("bCalidad").classList.remove("on"); }
+function cerrarMenus(){ if(!buscandoForma && formasAbiertas && ultimoMejor){ formasAbiertas = false; if(ultimasFilas) pintarFormas(ultimasFilas, ultimoMejor); } $("menuTeclas").classList.add("oculto"); $("menuCalidad").classList.add("oculto"); $("bTeclas").classList.remove("on"); $("bCalidad").classList.remove("on"); }
 $("bTeclas").onclick = e => { e.stopPropagation(); const o = $("menuTeclas").classList.contains("oculto"); cerrarMenus(); if(o) $("menuTeclas").classList.remove("oculto"); $("bTeclas").classList.toggle("on", o); colocarPanel(); };
 $("bCalidad").onclick = e => { e.stopPropagation(); const o = $("menuCalidad").classList.contains("oculto"); cerrarMenus(); if(o){ dibujarMenuCalidad(); $("menuCalidad").classList.remove("oculto"); } $("bCalidad").classList.toggle("on", o); colocarPanel(); };
 
@@ -1415,6 +1878,7 @@ document.addEventListener("pointerlockchange", () => {
   $("bJuego").classList.toggle("on", on);
   burbuja.classList.toggle("oculto", on);
   if(!on) capa.style.cursor = cursorRemoto;
+  posRemota = null; enviar(["poscursor", on ? 1 : 0]); pintarCursorT();
   if(on){ ocultarBarra(); mostrarPista(capturaNativa ? "Modo juego · Ctrl+Alt+Shift+G para salir" : "Modo juego · Ctrl+Alt+Shift+G o Esc para salir", 3000); }
 });
 
@@ -1459,9 +1923,10 @@ colocarBurbuja();
 
 function colocarPanel(){
   const r = burbuja.getBoundingClientRect(), W = innerWidth, H = innerHeight, pw = 280;
-  const ph = panel.offsetHeight || 260;
+  const ph = Math.min(panel.offsetHeight || 260, H - 16);
   let x = r.left + r.width / 2 - pw / 2; x = Math.min(W - pw - 8, Math.max(8, x));
   let y = r.bottom + 10; if(y + ph > H - 8) y = Math.max(8, r.top - ph - 10);
+  y = Math.max(8, Math.min(y, H - ph - 8)); // nunca se sale por abajo: si no entra, se desplaza adentro
   panel.style.left = x + "px"; panel.style.top = y + "px";
 }
 function abrirPanel(){ if(bloqueado()) return; panel.classList.add("ver"); burbuja.classList.add("activa"); colocarPanel(); }
@@ -1500,7 +1965,10 @@ $("bFull").onclick = () => { alternarPantallaCompleta(); setTimeout(colocarPanel
 $("bJuego").onclick = () => { ocultarBarra(); alternarModoJuego(); };
 $("bReconectar").onclick = () => { ocultarBarra(); reconectarYa(); };
 $("bSalir").onclick = desconectar;
+$("bArchivo").onclick = () => { ocultarBarra(); $("selArchivo").value = ""; $("selArchivo").click(); };
+$("selArchivo").onchange = () => enviarArchivos($("selArchivo").files, null);
 $("bMedir").onclick = medirRetraso;
+$("bBuscarForma").onclick = buscarFormaRapida;
 
 // ---------------- Medidor de retraso real ----------------
 // La otra PC muestra un cuadrito en la esquina de abajo a la derecha. Le pedimos
@@ -1509,18 +1977,32 @@ $("bMedir").onclick = medirRetraso;
 const dormir = ms => new Promise(r => setTimeout(r, ms));
 let midiendo = false;
 async function medirRetraso(){
-  if(midiendo) return;
+  if(midiendo || buscandoForma) return;
   if(!infoHost || !video.requestVideoFrameCallback || !video.videoWidth){ toast("Todavía no se puede medir: espera a que cargue la imagen"); return; }
   midiendo = true;
   const btn = $("bMedir"); btn.disabled = true; btn.querySelector("span").textContent = "Midiendo… (mira la esquina)";
+  let res = [];
+  try{ res = await muestrasRetraso(8); }
+  finally{ midiendo = false; btn.disabled = false; btn.querySelector("span").textContent = "Medir retraso real"; }
+  if(res.length < 3){ toast("No se pudo medir (¿la esquina de la otra PC está tapada?)"); return; }
+  const med = res[Math.floor(res.length / 2)];
+  $("sRetraso").innerHTML = `Retraso real: <b>${med.toFixed(0)} ms</b> (mín ${res[0].toFixed(0)} · máx ${res[res.length - 1].toFixed(0)})`;
+  retrasoReal = med;
+  toast(`Retraso real: ${med.toFixed(0)} ms`);
+}
+// muestrasRetraso: n mediciones del retraso completo, ordenadas de menor a mayor.
+async function muestrasRetraso(n){
   const [W, H] = infoHost.pantalla, M = infoHost.marca;
-  const cv = document.createElement("canvas"); cv.width = cv.height = 4;
-  const cx = cv.getContext("2d", {willReadFrequently: true});
+  // Canvas chiquito en la gráfica: se lee solo 2×2 píxeles. (Con un canvas en
+  // memoria, el navegador copiaba el cuadro entero en cada medición y el video
+  // se frenaba: las mediciones salían infladas y todo parecía "a saltos".)
+  const cv = document.createElement("canvas"); cv.width = cv.height = 2;
+  const cx = cv.getContext("2d");
   const luz = () => {
     const vw = video.videoWidth, vh = video.videoHeight;
     const sx = vw * (W - M * 0.75) / W, sy = vh * (H - M * 0.75) / H, sw = vw * (M * 0.5) / W, sh = vh * (M * 0.5) / H;
-    cx.drawImage(video, sx, sy, sw, sh, 0, 0, 4, 4);
-    const d = cx.getImageData(0, 0, 4, 4).data; let t = 0;
+    cx.drawImage(video, sx, sy, sw, sh, 0, 0, 2, 2);
+    const d = cx.getImageData(0, 0, 2, 2).data; let t = 0;
     for(let i = 0; i < d.length; i += 4) t += d[i] + d[i + 1] + d[i + 2];
     return t / (d.length / 4) / 3;
   };
@@ -1537,7 +2019,7 @@ async function medirRetraso(){
   try{
     enviar(["marca", 1]);
     await esperar(() => luz() < 60, 3000); await dormir(300);
-    for(let i = 0; i < 8 && pc; i++){
+    for(let i = 0; i < n && pc; i++){
       const t0 = performance.now();
       enviar(["marca", 2]);
       const t = await esperar(() => luz() > 190, 2500);
@@ -1548,16 +2030,121 @@ async function medirRetraso(){
     }
   } finally {
     enviar(["marca", 0]);
-    midiendo = false; btn.disabled = false; btn.querySelector("span").textContent = "Medir retraso real";
   }
-  if(res.length < 3){ toast("No se pudo medir (¿la esquina de la otra PC está tapada?)"); return; }
-  res.sort((a, b) => a - b);
-  const med = res[Math.floor(res.length / 2)];
-  $("sRetraso").innerHTML = `Retraso real: <b>${med.toFixed(0)} ms</b> (mín ${res[0].toFixed(0)} · máx ${res[res.length - 1].toFixed(0)})`;
-  retrasoReal = med;
-  toast(`Retraso real: ${med.toFixed(0)} ms`);
+  return res.sort((a, b) => a - b);
 }
 let retrasoReal = null;
+
+// ---------------- Buscar la forma de captura más rápida ----------------
+// Pasa por cada forma de captura de la otra PC (sin cortar la imagen), mide el
+// retraso real y la fluidez con cada una, y deja fija la más rápida que vaya pareja.
+var buscandoForma = false, esperaForma = null, fluidez = null;
+function respuestaForma(m){
+  if(esperaForma && m.nombre === esperaForma.nombre){ const r = esperaForma.res; esperaForma = null; r(m); }
+}
+function cambiarForma(nombre, guardar){
+  return new Promise(res => {
+    const t = setTimeout(() => { if(esperaForma && esperaForma.nombre === nombre){ esperaForma = null; res({ok: false, error: "la PC no respondió"}); } }, 40000);
+    esperaForma = {nombre, res: m => { clearTimeout(t); res(m); }};
+    enviar(["forma", nombre, !!guardar]);
+  });
+}
+const nombreCorto = n => n.replace(/\s*\((h26[45]_\w+|libx26[45]|gdigrab \+ libx264)\)\s*$/, "").replace(/^AMD por GPU/, "AMD");
+var formasAbiertas = true, ultimasFilas = null, ultimoMejor = null;
+function pintarFormas(filas, mejor){
+  ultimasFilas = filas; ultimoMejor = mejor;
+  const el = $("sFormas"); el.classList.remove("oculto");
+  const fin = mejor && !buscandoForma;
+  const m = fin && filas.find(f => f.nombre === mejor);
+  const cab = fin
+    ? `<div class="fcab"><span>★ ${nombreCorto(mejor)} · <b>${m && m.ms != null ? m.ms.toFixed(0) + " ms" : ""}</b></span>` +
+      `<button id="bVerFormas">${formasAbiertas ? "Ocultar" : "Ver todas"}</button><button id="bCerrarFormas" title="Quitar">✕</button></div>`
+    : "";
+  const lista = (!fin || formasAbiertas) ? filas.map(f => `<div class="f${f.nombre === mejor ? " mejor" : ""}"><span title="${f.nombre}">${f.nombre === mejor ? "★ " : ""}${nombreCorto(f.nombre)}</span><b>${f.txt}</b></div>`).join("") : "";
+  el.innerHTML = cab + lista;
+  if(fin){
+    $("bVerFormas").onclick = e => { e.stopPropagation(); formasAbiertas = !formasAbiertas; pintarFormas(ultimasFilas, ultimoMejor); colocarPanel(); };
+    $("bCerrarFormas").onclick = e => { e.stopPropagation(); el.classList.add("oculto"); colocarPanel(); };
+  }
+  colocarPanel();
+}
+async function buscarFormaRapida(){
+  if(buscandoForma || midiendo) return;
+  if(!infoHost || !video.requestVideoFrameCallback || !video.videoWidth || formasHost.length < 2){ toast("Todavía no se puede: espera a que cargue la imagen"); return; }
+  buscandoForma = true; formasAbiertas = true; cerrarMenus();
+  const btn = $("bBuscarForma"), txt = btn.querySelector("span"); btn.disabled = true; $("bMedir").disabled = true;
+  const inicial = formaHost, filas = formasHost.map(n => ({nombre: n, txt: "…"}));
+  // Primero la que está en uso (ya sabemos que anda), después las demás.
+  const orden = [inicial, ...formasHost.filter(n => n !== inicial)].filter(Boolean);
+  const intervalo = 1000 / (fpsPedido || 60);
+  pintarFormas(filas, null);
+  try{
+    for(let i = 0; i < orden.length && pc; i++){
+      const nom = orden[i], fila = filas.find(f => f.nombre === nom);
+      txt.textContent = `Probando ${i + 1} de ${orden.length}… (no toques nada)`;
+      fila.txt = "probando…"; pintarFormas(filas, null);
+      if(nom !== formaHost || i > 0){
+        const r = await cambiarForma(nom, false);
+        if(!r.ok){ fila.txt = "no funciona"; fila.mal = true; pintarFormas(filas, null); continue; }
+        formaHost = nom;
+      }
+      await dormir(1200); // que se asiente
+      // Fluidez: 2,5 s mirando nada más cuántos cuadros llegan y si hay huecos.
+      fluidez = [];
+      await dormir(2500);
+      const t = fluidez; fluidez = null;
+      let fps = 0, saltos = 0;
+      if(t.length > 10){
+        fps = (t.length - 1) * 1000 / (t[t.length - 1] - t[0]);
+        for(let k = 1; k < t.length; k++) if(t[k] - t[k - 1] > intervalo * 2.5) saltos++;
+        saltos = saltos / (t.length - 1) * 100;
+      }
+      const res = await muestrasRetraso(6);
+      if(res.length < 3){ fila.txt = "no se pudo medir"; fila.mal = true; pintarFormas(filas, null); continue; }
+      fila.ms = res[Math.floor(res.length / 2)];
+      fila.fps = fps; fila.saltos = saltos;
+      // Una forma que pierde muchos cuadros "se siente" peor aunque el número sea bajo.
+      fila.pareja = fps >= (fpsPedido || 60) * 0.8 && saltos < 5;
+      fila.txt = `${fila.ms.toFixed(0)} ms · ${fps.toFixed(0)} FPS${fila.pareja ? "" : " · a saltos"}`;
+      pintarFormas(filas, null);
+    }
+    const buenas = filas.filter(f => f.ms != null);
+    if(!buenas.length || !pc){ toast("No se pudo comparar. Vuelve a intentarlo."); return; }
+    // Solo cuentan las que van parejas; entre ellas, las de la gráfica antes que
+    // las del procesador (el procesador se satura apenas abres algo pesado).
+    const porProcesador = f => /^Procesador/.test(f.nombre);
+    let candidatas = buenas.filter(f => f.pareja && !porProcesador(f));
+    if(!candidatas.length) candidatas = buenas.filter(f => f.pareja);
+    let mejor, sinPareja = false;
+    if(candidatas.length){
+      candidatas.sort((a, b) => (a.ms - b.ms) || (b.fps - a.fps));
+      mejor = candidatas[0];
+    } else {
+      // Ninguna fue pareja: no es la forma de captura (seguramente la red o la
+      // otra PC). Quedarse con la que se usaba antes.
+      mejor = filas.find(f => f.nombre === inicial && f.ms != null) || buenas.sort((a, b) => b.fps - a.fps)[0];
+      sinPareja = true;
+    }
+    txt.textContent = "Dejando la más rápida…";
+    const r = await cambiarForma(mejor.nombre, true);
+    if(r.ok){
+      formaHost = mejor.nombre;
+      ultimoMejor = mejor.nombre;
+      $("sRetraso").innerHTML = `Retraso real: <b>${mejor.ms.toFixed(0)} ms</b> con la forma más rápida`;
+      retrasoReal = mejor.ms;
+      toast(sinPareja ? "Ninguna fue del todo pareja (puede ser la red): queda la de siempre."
+                      : `Listo: ${nombreCorto(mejor.nombre)} (${mejor.ms.toFixed(0)} ms). Queda guardada.`);
+    } else {
+      toast("No se pudo dejar la más rápida: " + (r.error || ""));
+    }
+  } finally {
+    fluidez = null; buscandoForma = false;
+    btn.disabled = false; $("bMedir").disabled = false; txt.textContent = "Buscar la forma más rápida";
+    // Al terminar queda solo la ganadora a la vista (la lista se abre con "Ver todas").
+    formasAbiertas = false;
+    if(ultimasFilas) pintarFormas(ultimasFilas, ultimoMejor);
+  }
+}
 
 let timerPista = null;
 function mostrarPista(txt, ms){
@@ -1643,6 +2230,22 @@ function dibujarHost(e){
 
   // Internet
   $("codigoHost").textContent = e.codigo || "—";
+  if(e.capturas && document.activeElement !== $("selCaptura")){
+    const opts = '<option value="">' + (e.captura ? "Automática (ahora: " + escapar(e.captura) + ")" : "Automática") + "</option>" +
+      e.capturas.map(n => `<option value="${escapar(n)}">${escapar(n)}</option>`).join("");
+    if($("selCaptura").dataset.h !== opts){ $("selCaptura").innerHTML = opts; $("selCaptura").dataset.h = opts; }
+  }
+  {
+    const activos = [e.relevoPropio, e.relevo ? "Cloudflare" : ""].filter(Boolean);
+    $("relPunto").className = activos.length ? "si" : "";
+    $("relTexto").textContent = activos.length ? "Activo (" + activos.join(" + ") + "): si no hay camino directo, el video pasa por el relevo." : "Sin configurar: en algunas redes de datos móviles no vas a poder entrar.";
+    $("relQuitar").classList.toggle("oculto", !e.relevo);
+    $("relEQuitar").classList.toggle("oculto", !e.relevoPropio);
+    $("relUso").classList.toggle("oculto", !e.relevo);
+    const gb = e.relevoUsoGB || 0;
+    $("relUsoTxt").textContent = (gb < 1 ? Math.round(gb * 1024) + " MB" : (gb < 10 ? gb.toFixed(1) : Math.round(gb)) + " GB") + " de 900 GB";
+    $("relUsoBarra").style.width = Math.min(100, gb / 9) + "%";
+  }
   const enlace = enlaceWeb(e);
   $("qrInetFila").classList.toggle("oculto", !e.internet || !enlace);
   if(enlace && e.internet) dibujarQR(enlace, $("qrInet"), true);
@@ -1680,14 +2283,6 @@ function dibujarHost(e){
   // Contraseña
   $("claveHost").textContent = verClaveHost ? e.clave : "•".repeat(Math.max(8, (e.clave || "").length));
 
-  // Confianza
-  $("swPedir").classList.toggle("on", e.pedirAceptar);
-  const lista = e.confianza || [];
-  const hc = lista.length ? lista.map(c => `<div class="eq"><span class="av">${ICO.pc}</span>
-      <div><b>${escapar(c.nombre)}</b><small>Desde ${escapar(c.desde)}</small></div>
-      <button class="btn peligro chico" data-quitar="${escapar(c.id)}">Quitar</button></div>`).join("")
-    : `<div class="vacio">Ninguno todavía. Cuando aceptes un equipo con “Recordar”, aparecerá aquí.</div>`;
-  if($("listaConfianza").dataset.h !== hc){ $("listaConfianza").innerHTML = hc; $("listaConfianza").dataset.h = hc; }
 
   // Ayudante
   const ay = e.ayudante;
@@ -1778,6 +2373,32 @@ $("swCompartir").onclick = () => est && accionHost({accion: "compartir", valor: 
 $("verClave").onclick = () => { verClaveHost = !verClaveHost; dibujarHost(est); };
 $("copiarClave").onclick = () => est && copiar(est.clave);
 $("copiarCodigo").onclick = () => est && est.codigo && copiar(est.codigo.replace(/\s/g, ""));
+$("relGuardar").onclick = async () => {
+  const id = $("relID").value.trim(), token = $("relToken").value.trim();
+  if(!id || !token){ toast("Pega el Turn Token ID y el API Token"); return; }
+  $("relGuardar").disabled = true; $("relGuardar").textContent = "Probando…";
+  try{
+    await apiLocal("accion", {accion: "relevo", id, texto: token});
+    $("relID").value = ""; $("relToken").value = ""; $("relDetalles").open = false;
+    toast("¡Relevo listo!");
+  }catch(e){ toast(e.message || "No funcionó"); }
+  $("relGuardar").disabled = false; $("relGuardar").textContent = "Probar y guardar";
+  dibujarHost(await apiLocal("estado"));
+};
+$("relQuitar").onclick = () => accionHost({accion: "relevo", id: "", texto: ""});
+$("relEGuardar").onclick = async () => {
+  const serv = $("relEServ").value.trim() || "relay1.expressturn.com", usu = $("relEUsu").value.trim(), clave = $("relEClave").value.trim();
+  if(!usu || !clave){ toast("Pega el usuario y la contraseña de ExpressTURN"); return; }
+  $("relEGuardar").disabled = true; $("relEGuardar").textContent = "Probando…";
+  try{
+    await apiLocal("accion", {accion: "relevo_propio", id: serv, texto: usu, clave});
+    $("relEUsu").value = ""; $("relEClave").value = ""; $("relDetallesE").open = false;
+    toast("¡Relevo listo!");
+  }catch(e){ toast(e.message || "No funcionó"); }
+  $("relEGuardar").disabled = false; $("relEGuardar").textContent = "Probar y guardar";
+  dibujarHost(await apiLocal("estado"));
+};
+$("relEQuitar").onclick = () => accionHost({accion: "relevo_propio", id: "", texto: "", clave: ""});
 $("copiarEnlace").onclick = () => { const l = enlaceWeb(est); if(l) copiar(l); };
 $("abrirEnlace").onclick = () => { const l = enlaceWeb(est); if(l) window.open(l, "_blank"); };
 $("filaInternet").onclick = () => est && accionHost({accion: "internet", valor: !est.internet});
@@ -1787,8 +2408,9 @@ $("guardarClave").onclick = async () => {
   $("formClave").classList.add("oculto"); verClaveHost = true; dibujarHost(est); toast("Contraseña cambiada");
 };
 $("nuevaClave").addEventListener("keydown", e => { if(e.key === "Enter") $("guardarClave").click(); });
-$("interruptor").onclick = () => est && accionHost({accion: "pedir", valor: !est.pedirAceptar});
+
 $("bFirewall").onclick = () => accionHost({accion: "firewall"});
+$("selCaptura").onchange = () => { const v = $("selCaptura").value; if(v){ accionHost({accion: "elegir_captura", texto: v}); toast("Listo: vuelve a conectar para probarla"); } };
 $("bReprobar").onclick = () => { accionHost({accion: "reprobar"}); toast("Listo: la próxima conexión prueba todas"); };
 $("bAyuInstalar").onclick = () => { toast("Acepta el aviso de Windows (Sí)"); accionHost({accion: "ayudante_instalar"}); };
 $("bAyuQuitar").onclick = () => accionHost({accion: "ayudante_quitar"});
@@ -1830,6 +2452,9 @@ function alternarDiag(){
       "visible/foco  " + document.visibilityState + " / " + document.hasFocus(),
       "video         " + (video.paused ? "PAUSADO" : "ok") + " · " + (q.totalVideoFrames || 0) + " cuadros",
       "volvió        " + diag.ultimoVolver,
+      "calidad auto  " + (ctl ? (ctl.activo ? (ctl.actual/1000).toFixed(1) + " de " + ctl.max/1000 + " Mbps · cola " + (ctl.cola == null ? "–" : ctl.cola.toFixed(0) + " ms") : "apagada") : "—"),
+      "último ajuste " + (diag.ultimoAjuste || "—"),
+      "códec         " + (videoCodec || "—"),
     ].join("\n");
   };
   pintar(); timerDiag = setInterval(pintar, 500);
@@ -1847,6 +2472,53 @@ $("modalGuia").addEventListener("mousedown", e => { if(e.target === $("modalGuia
 // Lo mismo que hace RemotoPC (Go) en la app: el pedido va cifrado con la contraseña
 // (PBKDF2 + AES-256-GCM) por el punto de encuentro gratis (ntfy.sh), y la PC responde.
 const PUNTO = window.__punto || "https://ntfy.sh";
+// Puntos de encuentro MQTT por WebSocket seguro: los mismos servidores que usa
+// la app (EMQX y HiveMQ). ntfy.sh queda de respaldo (tiene límite diario).
+const MQTT_WSS = window.__mqttWss || ["wss://broker.emqx.io:8084/mqtt", "wss://broker.hivemq.com:8884/mqtt"];
+// Cliente MQTT 3.1.1 mínimo (QoS 0): conectar, suscribirse, publicar.
+function abrirMQTT(url, tema, alLlegar){
+  let ws, ping, abierto = false;
+  const largo = n => { const o = []; do { let b = n % 128; n = Math.floor(n / 128); if(n > 0) b |= 128; o.push(b); } while(n > 0); return o; };
+  const str = t => { const b = te.encode(t); return [b.length >> 8, b.length & 255, ...b]; };
+  const paquete = (tipo, cuerpo) => new Uint8Array([tipo, ...largo(cuerpo.length), ...cuerpo]);
+  const listo = new Promise(res => {
+    try{ ws = new WebSocket(url, "mqtt"); }catch(e){ return res(false); }
+    ws.binaryType = "arraybuffer";
+    const t = setTimeout(() => res(false), 4000);
+    let buf = new Uint8Array(0);
+    ws.onopen = () => {
+      const id = "rpcw" + hexDe(crypto.getRandomValues(new Uint8Array(8)));
+      ws.send(paquete(0x10, [...str("MQTT"), 4, 0x02, 0, 60, ...str(id)]));
+    };
+    ws.onmessage = e => {
+      const nuevo = new Uint8Array(e.data), b = new Uint8Array(buf.length + nuevo.length);
+      b.set(buf); b.set(nuevo, buf.length); buf = b;
+      for(;;){
+        if(buf.length < 2) return;
+        let n = 0, mult = 1, i = 1;
+        for(;;){ if(i >= buf.length) return; const c = buf[i++]; n += (c & 127) * mult; mult *= 128; if(!(c & 128)) break; }
+        if(buf.length < i + n) return;
+        const tipo = buf[0] >> 4, cuerpo = buf.slice(i, i + n); buf = buf.slice(i + n);
+        if(tipo === 2){ // CONNACK → suscribirse
+          if(cuerpo[1] !== 0){ clearTimeout(t); res(false); return; }
+          ws.send(paquete(0x82, [0, 1, ...str(tema), 0]));
+        } else if(tipo === 9){ // SUBACK → listo
+          clearTimeout(t); abierto = true; res(true);
+          ping = setInterval(() => { try{ ws.send(new Uint8Array([0xC0, 0])); }catch(e){} }, 30000);
+        } else if(tipo === 3){ // PUBLISH (QoS 0)
+          const lt = (cuerpo[0] << 8) | cuerpo[1];
+          alLlegar(td.decode(cuerpo.slice(2 + lt)));
+        }
+      }
+    };
+    ws.onerror = ws.onclose = () => { clearTimeout(t); clearInterval(ping); abierto = false; res(false); };
+  });
+  return {
+    listo,
+    publicar(t, txt){ if(abierto) ws.send(paquete(0x30, [...str(t), ...te.encode(txt)])); },
+    cerrar(){ clearInterval(ping); try{ ws.send(new Uint8Array([0xE0, 0])); ws.close(); }catch(e){} },
+  };
+}
 const te = new TextEncoder(), td = new TextDecoder();
 function b64u(buf){
   const a = new Uint8Array(buf); let s = "";
@@ -1890,13 +2562,31 @@ async function llamarJS(tipo, codigo, clave, pedido){
   if(pedido) msg.pedido = Object.assign({}, pedido, {clave: ""});
   const c = await sellarJS(llave, "pedido:" + r, msg);
   const ctl = new AbortController(), fin = setTimeout(() => ctl.abort(), 55000);
-  try{
+  const cola = []; let avisar = null;
+  const meter = x => { cola.push(x); if(avisar) avisar(); };
+  let algo = false; // ya llegó alguna respuesta
+  const procesar = async txt => {
+    let sb; try{ sb = JSON.parse(txt); }catch(e){ return; }
+    if(!sb || (!sb.c && !sb.e)) return; // (el propio pedido, si vuelve)
+    algo = true;
+    if(sb.e === "clave"){ meter({t: "error", codigo: "clave", error: "contraseña incorrecta"}); return; }
+    try{ meter(await abrirJS(llave, "respuesta:" + r, sb.c)); }catch(e){}
+  };
+  const temaHost = await temaHostJS(codigo), pedidoTxt = JSON.stringify({v: 1, r, c});
+  // 1) MQTT por WebSocket (sin límite diario).
+  const mqtts = MQTT_WSS.map(u => abrirMQTT(u, "remotopc/" + r, procesar));
+  const algunoListo = await new Promise(res => {
+    let pend = mqtts.length; if(!pend) return res(false);
+    mqtts.forEach(m => m.listo.then(ok => { if(ok) res(true); else if(--pend === 0) res(false); }));
+  });
+  for(const m of mqtts) m.listo.then(ok => { if(ok) m.publicar("remotopc/" + temaHost, pedidoTxt); });
+  // 2) ntfy.sh de respaldo: solo si por MQTT nadie contestó en 2,5 s.
+  let ntfyError = null;
+  const porNtfy = async () => {
     let resp;
     try{ resp = await fetch(`${PUNTO}/${r}/json?since=all`, {signal: ctl.signal, cache: "no-store"}); }
-    catch(e){ return {status: 502, j: {error: "No pude llegar al punto de encuentro (ntfy.sh). ¿Sin internet o bloqueado en esta red?"}}; }
-    if(!resp.ok) return {status: resp.status === 429 ? 429 : 502, j: {error: "El punto de encuentro respondió " + resp.status}};
-    const cola = []; let avisar = null;
-    const meter = x => { cola.push(x); if(avisar) avisar(); };
+    catch(e){ ntfyError = "No pude llegar al punto de encuentro."; return; }
+    if(!resp.ok){ ntfyError = "El punto de encuentro respondió " + resp.status; return; }
     (async () => {
       const lector = resp.body.getReader(); let buf = "";
       try{
@@ -1911,34 +2601,35 @@ async function llamarJS(tipo, codigo, clave, pedido){
             if(m.event !== "message") continue;
             let txt = m.message;
             if(m.attachment && m.attachment.url){ try{ txt = await (await fetch(m.attachment.url)).text(); }catch(e){ continue; } }
-            let sb; try{ sb = JSON.parse(txt); }catch(e){ continue; }
-            if(sb.e === "clave"){ meter({t: "error", codigo: "clave", error: "contraseña incorrecta"}); continue; }
-            try{ meter(await abrirJS(llave, "respuesta:" + r, sb.c)); }catch(e){}
+            procesar(txt);
           }
         }
       }catch(e){}
-      meter(null);
     })();
+    try{
+      const pub = await fetch(`${PUNTO}/${temaHost}`, {method: "POST", body: pedidoTxt, signal: ctl.signal});
+      if(!pub.ok) ntfyError = pub.status === 429 ? "Demasiados intentos seguidos." : "El punto de encuentro respondió " + pub.status;
+    }catch(e){ ntfyError = "No pude enviar el pedido al punto de encuentro."; }
+  };
+  const respaldo = setTimeout(() => { if(!algo) porNtfy(); }, algunoListo ? 2500 : 0);
+  try{
     const siguiente = ms => new Promise(res => {
       if(cola.length) return res(cola.shift());
       const t = setTimeout(() => { avisar = null; res(undefined); }, ms);
       avisar = () => { clearTimeout(t); avisar = null; res(cola.shift()); };
     });
-    let pub;
-    try{ pub = await fetch(`${PUNTO}/${await temaHostJS(codigo)}`, {method: "POST", body: JSON.stringify({v: 1, r, c}), signal: ctl.signal}); }
-    catch(e){ return {status: 502, j: {error: "No pude enviar el pedido al punto de encuentro."}}; }
-    if(pub.status === 429) return {status: 429, j: {error: "Demasiados intentos seguidos."}};
-    if(!pub.ok) return {status: 502, j: {error: "El punto de encuentro respondió " + pub.status}};
     let plazo = Date.now() + 12000;
     for(;;){
       const res = await siguiente(Math.max(0, plazo - Date.now()));
-      if(res === undefined) return {status: 504, j: {error: "La PC no responde por internet."}};
-      if(res === null) return {status: 502, j: {error: "Se cortó la conexión con el punto de encuentro."}};
+      if(res === undefined){
+        if(!algunoListo && ntfyError) return {status: 502, j: {error: ntfyError + " ¿Sin internet o bloqueado en esta red?"}};
+        return {status: 504, j: {error: "La PC no responde por internet."}};
+      }
       if(res.t === "recibido"){ plazo = Date.now() + 55000; continue; }
       if(res.t === "error") return {status: ({clave: 401, rechazado: 403, ocupado: 409})[res.codigo] || 500, j: res};
       return {status: 200, j: res};
     }
-  } finally { clearTimeout(fin); ctl.abort(); }
+  } finally { clearTimeout(fin); clearTimeout(respaldo); ctl.abort(); mqtts.forEach(m => m.cerrar()); }
 }
 
 // Enlace del QR: …/remotopc/#pc=482913557&n=PC%20principal → agrega esa PC (solo falta la contraseña).
@@ -1988,11 +2679,19 @@ function rectVideo(){
   const w = vw * esc, h = vh * esc;
   return {l: r.left + (r.width - w) / 2, t: r.top + (r.height - h) / 2, w, h};
 }
+// Puntero dibujado encima del video: en el celular (modo touchpad) y en el modo
+// juego (el mouse de la laptop queda atrapado y la PC dice dónde está el suyo).
+let posRemota = null;
 function pintarCursorT(){
   const rv = rectVideo(), c = $("cursorT");
-  const ver = tactil && visorActivo() && rv && modoToque === "touchpad";
+  const juego = bloqueado() && posRemota && cursorRemoto !== "none";
+  const toque = tactil && modoToque === "touchpad" && !bloqueado();
+  const ver = visorActivo() && rv && (juego || toque);
   c.classList.toggle("oculto", !ver);
-  if(ver){ c.style.left = (rv.l + tp.x * rv.w) + "px"; c.style.top = (rv.t + tp.y * rv.h) + "px"; }
+  if(!ver) return;
+  const p = juego ? posRemota : tp;
+  c.style.left = (rv.l + Math.min(1, Math.max(0, p.x)) * rv.w) + "px";
+  c.style.top = (rv.t + Math.min(1, Math.max(0, p.y)) * rv.h) + "px";
 }
 const mandarCursor = () => { enviarMov(["m", +tp.x.toFixed(5), +tp.y.toFixed(5)]); pintarCursorT(); };
 function clic(b){ enviar(["d", b]); enviar(["u", b]); }
