@@ -566,6 +566,18 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
                 <div style="margin-top:8px"><button class="btn peligro chico oculto" id="bAyuQuitar">Quitar ayudante</button></div></div>
             </details>
           </section>
+          <section class="tarjeta" id="tActualizar">
+            <h3 style="margin:0 0 6px">Actualizaciones</h3>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px"><b id="actuVersion">Versión</b><small id="actuTxt" style="display:block;color:var(--suave)"></small></div>
+              <button class="btn sec chico" id="bActuBuscar">Buscar ahora</button>
+              <button class="btn chico oculto" id="bActuAhora">Actualizar ahora</button>
+            </div>
+            <div class="interruptor" id="filaActuSola" style="border-bottom:0;margin:8px 0 0;padding-bottom:0">
+              <div><b>Actualizar sola</b><small>Cuando sale una versión nueva, se instala sola en un momento en que nadie está conectado y se vuelve a abrir en segundos. Tu código, contraseña y PCs se mantienen.</small></div>
+              <span class="sw" id="swActuSola"></span>
+            </div>
+          </section>
           <section class="tarjeta" id="tActividad">
             <details id="detActividad" style="margin:0"><summary style="margin:0">Actividad (para encontrar fallas)</summary><div class="log" id="log"></div>
               <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
@@ -833,6 +845,7 @@ const resolucionElegida = cont => (cont.querySelector(".cal.sel") || {}).dataset
 let editando = null;
 
 function mostrarInicio(){
+  avisarSesion(false);
   avisarCaptura(false);
   $("visor").classList.add("oculto");
   $("inicio").classList.remove("oculto");
@@ -1109,8 +1122,10 @@ async function servidoresICE(){
   }catch(e){ return [{urls: ["stun:stun.cloudflare.com:3478", "stun:stun.l.google.com:19302"]}]; }
 }
 
+// La app no se actualiza mientras estás controlando otra PC.
+const avisarSesion = v => { try{ if(TOKEN) apiLocal("accion", {accion: "enSesion", valor: v}).catch(() => {}); }catch(e){} };
 async function conectar(eq){
-  actual = eq; manual = false;
+  actual = eq; manual = false; avisarSesion(true);
   limpiar();
   $("inicio").classList.add("oculto"); $("visor").classList.remove("oculto");
   const nom = escapar(eq.nombre || eq.dir || "la PC");
@@ -1147,7 +1162,9 @@ async function conectar(eq){
     const h265 = caps.filter(c => c.mimeType === "video/H265"), h264 = caps.filter(c => c.mimeType === "video/H264");
     // H.265 solo si lo encendiste a mano: en algunas laptops el navegador se
     // cae al recibirlo (es experimental en WebRTC) y H.264 tiene menos retraso.
-    quiereH265 = h265.length > 0 && config.codec === "h265" && !sinH265;
+    // H.265 desactivado: en algunas PCs la ventana se cae al recibirlo (falla del
+    // motor de video de Windows, todavía experimental). Siempre H.264.
+    quiereH265 = false;
     const orden = (quiereH265 ? h265 : []).concat(h264);
     if(orden.length && tr.setCodecPreferences) tr.setCodecPreferences(orden.concat(caps.filter(c => !orden.includes(c))));
   }catch(e){ quiereH265 = false; }
@@ -1576,6 +1593,7 @@ window.addEventListener("focus", () => { if(pc) revisarPortapapeles(); });
 
 // ---------------- Estadísticas y vigilante ----------------
 let videoCodec = "";
+let contEstad = 0;
 let statsPrev = null, codificador = "", sinCuadros = 0, statsSonido = null, saltosSonido = 0, inicioSonido = 0;
 async function actualizarStats(){
   if(!pc) return;
@@ -1630,6 +1648,11 @@ async function actualizarStats(){
     if(videoCodec) det.push(videoCodec);
   }
   if(inb.frameWidth) det.push(inb.frameWidth + "×" + inb.frameHeight);
+  // Contarle a la PC compartida cómo se ve aquí (para su registro).
+  if(++contEstad % 5 === 0){
+    try{ enviar(["estad", inb.freezeCount || 0, Math.round((inb.totalFreezesDuration || 0) * 1000), inb.pliCount || 0,
+      inb.packetsLost || 0, inb.framesDropped || 0, (inb.decoderImplementation || "?") + (inb.powerEfficientDecoder ? " (gráfica)" : "")]); }catch(e){}
+  }
   // Sonido: si al empezar quedó audio acumulado (el reproductor tardó en arrancar),
   // pedir a la PC que salte ese pedazo para que suene al instante.
   let aud = null;
@@ -1665,10 +1688,34 @@ window.addEventListener("focus", () => window.__alVolver());
 window.addEventListener("resize", () => { if(visorActivo() && video.paused) video.play().catch(() => {}); });
 
 // ---------------- Teclado y mouse ----------------
-function enviar(m){ if(dc && dc.readyState === "open"){ dc.send(JSON.stringify(m)); diag.enviados++; } }
+let relX = 0, relY = 0, relPend = false;
+function enviar(m){
+  // Antes de un clic, tecla o rueda: mandar ya el movimiento acumulado, para que
+  // llegue en orden (primero se mueve, después se hace clic).
+  if((relX || relY) && (m[0] === "d" || m[0] === "u" || m[0] === "k" || m[0] === "w" || m[0] === "h")) vaciarRel(true);
+  if(dc && dc.readyState === "open"){ dc.send(JSON.stringify(m)); diag.enviados++; }
+}
 function enviarMov(m){
   if(dcMouse && dcMouse.readyState === "open"){ dcMouse.send(JSON.stringify(m)); diag.enviados++; }
   else enviar(m);
+}
+// Movimiento relativo (modo juego): un mouse de juego manda hasta 1000 eventos por
+// segundo. Mandarlos uno por uno por el canal confiable atascaba todo (los clics
+// incluidos) cuando el WiFi perdía un paquete y después llegaba TODO junto: el
+// mouse "se aceleraba" y los clics salían tarde o dobles. Ahora se suman cada 4 ms
+// y van por el canal rápido (sin reenvíos); los clics siguen por el confiable.
+function enviarRel(dx, dy){
+  relX += dx; relY += dy;
+  if(!relPend){ relPend = true; setTimeout(() => vaciarRel(false), 4); }
+}
+function vaciarRel(confiable){
+  relPend = false;
+  if(!relX && !relY) return;
+  const ix = Math.round(relX), iy = Math.round(relY);
+  relX -= ix; relY -= iy; // lo que sobra (fracciones) queda para el próximo
+  if(!ix && !iy) return;
+  const m = ["r", ix, iy];
+  if(confiable) enviar(m); else enviarMov(m);
 }
 const visorActivo = () => !$("visor").classList.contains("oculto") && !!pc;
 const bloqueado = () => document.pointerLockElement === capa;
@@ -1706,7 +1753,7 @@ const eventoMover = ("onpointerrawupdate" in window) ? "pointerrawupdate" : "poi
 capa.addEventListener(eventoMover, e => {
   if(!visorActivo() || e.pointerType === "touch") return;
   if(bloqueado()){
-    if(e.movementX || e.movementY) enviar(["r", Math.round(e.movementX), Math.round(e.movementY)]);
+    if(e.movementX || e.movementY) enviarRel(e.movementX, e.movementY);
     return;
   }
   const p = posVideo(e);
@@ -1842,7 +1889,7 @@ function dibujarMenuCalidad(){
     };
     m.appendChild(b);
   }
-  if(!esNube){
+  if(false){ // H.265 quitado del menú (ver quiereH265)
     const b = document.createElement("button");
     const on = config.codec === "h265";
     if(on) b.className = "sel";
@@ -2299,6 +2346,20 @@ function dibujarHost(e){
   $("ayuError").textContent = e.ayudanteError || "";
   $("swUAC").classList.toggle("on", !!e.uacNormal);
 
+  // Actualizaciones
+  const au = e.actualizacion || {};
+  $("actuVersion").textContent = "Versión " + (e.version || "");
+  $("actuTxt").textContent = ({
+    al_dia: "Al día" + (au.revisado ? " (revisado " + au.revisado + ")" : ""),
+    buscando: "Buscando versiones nuevas…",
+    descargando: "Descargando la versión " + au.version + "…",
+    lista: "Versión " + au.version + " lista para instalar" + (e.actualizarSola ? ": se instala cuando nadie esté conectado" : ""),
+    aplicando: "Instalando la versión " + au.version + ": se vuelve a abrir en segundos…",
+    error: "No se pudo revisar: " + (au.error || ""),
+  })[au.estado] || "Revisa al abrir y cada 6 horas";
+  $("bActuAhora").classList.toggle("oculto", au.estado !== "lista");
+  $("swActuSola").classList.toggle("on", !!e.actualizarSola);
+
   // Actividad
   const act = e.actividad || [];
   const firma = act.length + "|" + (act.length ? act[act.length-1].hora + act[act.length-1].texto : "");
@@ -2414,6 +2475,9 @@ $("selCaptura").onchange = () => { const v = $("selCaptura").value; if(v){ accio
 $("bReprobar").onclick = () => { accionHost({accion: "reprobar"}); toast("Listo: la próxima conexión prueba todas"); };
 $("bAyuInstalar").onclick = () => { toast("Acepta el aviso de Windows (Sí)"); accionHost({accion: "ayudante_instalar"}); };
 $("bAyuQuitar").onclick = () => accionHost({accion: "ayudante_quitar"});
+$("bActuBuscar").onclick = () => { accionHost({accion: "buscarActualizacion"}); toast("Buscando versiones nuevas…"); };
+$("bActuAhora").onclick = () => { accionHost({accion: "actualizarAhora"}); toast("Instalando: RemotoPC se vuelve a abrir en unos segundos"); };
+$("filaActuSola").onclick = () => est && accionHost({accion: "actualizarSola", valor: !est.actualizarSola});
 $("filaUAC").onclick = () => { if(!est) return; toast("Acepta el aviso de Windows (Sí)"); accionHost({accion: "uac", valor: !est.uacNormal}); };
 $("hDesconectar").onclick = () => accionHost({accion: "desconectar"});
 $("mAceptar").onclick = () => { accionHost({accion: "responder", id: pendienteID, aceptar: true, recordar: $("mRecordar").checked}); $("modalSolicitud").classList.add("oculto"); };
