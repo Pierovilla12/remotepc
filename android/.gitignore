@@ -1,0 +1,6 @@
+firma.jks
+.gradle/
+build/
+app/build/
+local.properties
+app/src/main/res/drawable-nodpi/icono.png

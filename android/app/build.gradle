@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+// El número de versión lo pone GitHub Actions (número de armado).
+def codigo = (project.findProperty('codigo') ?: '1') as Integer
+
+android {
+    namespace 'com.remotopc.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.remotopc.app'
+        minSdk 24
+        targetSdk 34
+        versionCode codigo
+        versionName "1.0.${codigo}"
+    }
+
+    signingConfigs {
+        release {
+            // La llave viene de un secreto del repositorio (ANDROID_KEYSTORE_B64):
+            // siempre la misma, así la app se actualiza encima sin desinstalar.
+            storeFile file('../firma.jks')
+            storePassword 'remotopc-firma'
+            keyAlias 'remotopc'
+            keyPassword 'remotopc-firma'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
