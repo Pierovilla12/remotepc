@@ -402,6 +402,18 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
   background:#121821;border:1px solid var(--borde2);border-radius:16px;padding:12px 14px;color:var(--texto);font-size:12.5px;box-shadow:0 20px 60px rgba(0,0,0,.5);transition:opacity .15s}
 #mandoPanel.tenue{opacity:.15;pointer-events:none}
 #mandoPanel h5{margin:0 0 6px;font-size:13.5px}
+#mandoPanel .mpCab{display:flex;align-items:center;gap:8px;margin:-4px -4px 6px;padding:4px;border-radius:10px;user-select:none;-webkit-user-select:none}
+#mandoPanel .mpCab .asa,#mandoPanel .mpCab b{cursor:move;touch-action:none}
+#mandoPanel .mpCab .asa{font-size:18px;color:var(--suave);line-height:1;padding:2px 4px}
+#mandoPanel .mpCab b{flex:1;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mandoPanel .mpCab button{border:1px solid var(--borde2);background:#1d2635;color:var(--texto);border-radius:9px;padding:6px 11px;font-size:13px;font-weight:700;min-width:36px}
+#mandoPanel .mpCab button.azul{background:#4c8dff;border-color:#4c8dff;color:#fff}
+#mandoPanel.min{width:auto;max-width:calc(100% - 16px);padding:6px 8px}
+#mandoPanel.min .mpCab{margin:0}
+#mandoPanel.min .mpCuerpo{display:none}
+#mandoPanel .soloMin{display:none}
+#mandoPanel.min .soloMin{display:inline-block}
+#mandoPanel.min .noMin{display:none}
 #mandoPanel .fila{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
 #mandoPanel .chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
 #mandoPanel .chips button{border:1px solid var(--borde2);background:#1d2635;color:var(--texto);border-radius:8px;padding:6px 8px;font-size:12px;font-weight:700;min-width:32px}
@@ -3067,12 +3079,7 @@ function pintarMando(){
   const W = mandoEl.clientWidth || innerWidth, H = mandoEl.clientHeight || innerHeight;
   for(const c of p.controles){
     const el = document.createElement("div");
-    let w, h;
-    if(c.tipo === "zona"){ w = c.w * W; h = c.h * H; }
-    else { w = h = c.t * H; }
-    el.style.width = w + "px"; el.style.height = h + "px";
-    el.style.left = Math.min(W - w, Math.max(0, c.x * W - w / 2)) + "px";
-    el.style.top = Math.min(H - h, Math.max(0, c.y * H - h / 2)) + "px";
+    const {h} = colocarControl(el, c, W, H);
     if(c.tipo === "boton"){
       el.className = "mc mb " + (c.forma === "cuadro" ? "cuadro" : "");
       const txt = etqM(c.a);
@@ -3098,6 +3105,17 @@ function pintarMando(){
   }
 }
 
+// Pone un control en su lugar y tamaño (sin volver a dibujar todo).
+function colocarControl(el, c, W, H){
+  let w, h;
+  if(c.tipo === "zona"){ w = c.w * W; h = c.h * H; }
+  else { w = h = c.t * H; }
+  el.style.width = w + "px"; el.style.height = h + "px";
+  el.style.left = Math.min(W - w, Math.max(0, c.x * W - w / 2)) + "px";
+  el.style.top = Math.min(H - h, Math.max(0, c.y * H - h / 2)) + "px";
+  if(c.tipo === "boton" && el.firstChild) el.style.fontSize = Math.max(11, Math.min(h * .38, h * 1.5 / Math.max(1, etqM(c.a).length))) + "px";
+  return {w, h};
+}
 function conectarControl(el, c){
   el.addEventListener("pointerdown", e => {
     e.preventDefault(); e.stopPropagation();
@@ -3182,6 +3200,28 @@ function moverZona(c, e){
   z.x = e.clientX; z.y = e.clientY;
 }
 
+// alTocar: los botones del mando responden al LEVANTAR el dedo. Si se espera al
+// "click", el celular a veces lo pierde: un toque justo después de arrastrar algo
+// lo usa para frenar el arrastre. Después se ignora el click que llega igual
+// (si no, caería sobre el botón nuevo que quedó en el mismo lugar).
+let ignorarClicHasta = 0;
+function alTocar(cont, fn){
+  let ini = null;
+  cont.addEventListener("pointerdown", e => {
+    const b = e.target.closest("button");
+    ini = b && e.pointerType !== "mouse" ? {b, x: e.clientX, y: e.clientY} : null;
+  });
+  cont.addEventListener("pointerup", e => {
+    const d = ini; ini = null;
+    if(!d) return;
+    const b = document.elementFromPoint(e.clientX, e.clientY);
+    if(!b || b.closest("button") !== d.b || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 14) return;
+    ignorarClicHasta = Date.now() + 700;
+    fn({target: d.b});
+  });
+  cont.addEventListener("pointercancel", () => { ini = null; });
+  cont.addEventListener("click", e => { if(Date.now() < ignorarClicHasta) return; fn(e); });
+}
 // ---------- Editar: mover, cambiar tamaño, elegir qué manda cada botón ----------
 function empezarEdicionM(e, el, c){
   const redim = e.target.classList.contains("mh");
@@ -3199,7 +3239,7 @@ function empezarEdicionM(e, el, c){
     } else {
       c.x = Math.max(0, Math.min(1, ini.x + dx / W)); c.y = Math.max(0, Math.min(1, ini.y + dy / H));
     }
-    pintarMando();
+    colocarControl(el, c, W, H); // solo este control: el dedo sigue "agarrándolo"
   };
   const soltar = () => {
     removeEventListener("pointermove", mover); removeEventListener("pointerup", soltar); removeEventListener("pointercancel", soltar);
@@ -3211,7 +3251,10 @@ function empezarEdicionM(e, el, c){
 const chipsM = (lista, sel, attr) => `<div class="chips">` + lista.map(([v, t]) => `<button data-${attr}="${v}" class="${v === sel ? "sel" : ""}">${t}</button>`).join("") + `</div>`;
 function pintarPanelM(){
   const p = perfilM(), pn = $("mandoPanel"), xb = p.tipo === "xbox";
-  let h = `<h5>✎ Editando «${escapar(p.nombre)}»</h5><div class="nota">Toca un control para elegirlo · arrástralo para moverlo · cuadrito verde = tamaño</div>`;
+  let h = `<div class="mpCab" title="Arrástrame para moverme"><span class="asa">⠿</span><b>✎ Editando «${escapar(p.nombre)}»</b>` +
+    `<button class="soloMin" data-hacer="max">${mSel ? "Opciones" : "Abrir"} ▾</button><button class="soloMin azul" data-hacer="listo">Listo</button>` +
+    `<button class="noMin" data-hacer="min" title="Minimizar">–</button></div><div class="mpCuerpo">` +
+    `<div class="nota">Toca un control para elegirlo · arrástralo para moverlo · cuadrito verde = tamaño · esta ventana se mueve desde ⠿ y se achica con –</div>`;
   if(mSel && mSel.tipo === "boton"){
     const a = mSel.a || {};
     h += `<b>Este botón manda:</b>`;
@@ -3234,9 +3277,11 @@ function pintarPanelM(){
     `<div class="fila"><span>Vibrar al tocar</span><button class="sw ${p.vibrar ? "on" : ""}" data-sw="vibrar" data-global="1"></button></div>` +
     `<div class="acc"><button data-hacer="boton">＋ Botón</button>${p.controles.some(c => c.tipo === "stick") ? "" : `<button data-hacer="stick">＋ Stick</button>`}${p.controles.some(c => c.tipo === "zona") ? "" : `<button data-hacer="zona">＋ Cámara</button>`}</div>` +
     `<div class="acc"><button data-hacer="cancelar">Cancelar</button><button data-hacer="base">Restablecer</button><button class="azul" data-hacer="listo">Listo</button></div>`;
-  pn.innerHTML = h;
+  pn.innerHTML = h + `</div>`;
+  pn.classList.toggle("min", mMin);
+  colocarPanelM();
 }
-$("mandoPanel").addEventListener("click", e => {
+alTocar($("mandoPanel"), e => {
   const b = e.target.closest("button"); if(!b) return;
   const p = perfilM(), d = b.dataset, xb = p.tipo === "xbox";
   if(d.k !== undefined && mSel){ mSel.a = {k: d.k}; }
@@ -3246,9 +3291,11 @@ $("mandoPanel").addEventListener("click", e => {
   else if(d.modo && mSel){ mSel.modo = d.modo; }
   else if(d.sw){ const o = d.global ? p : mSel; if(o) o[d.sw] = !o[d.sw]; }
   else if(d.hacer === "quitar" && mSel){ p.controles = p.controles.filter(c => c !== mSel); mSel = null; }
-  else if(d.hacer === "boton"){ mSel = bt(.5, .5, .15, xb ? {x: "A"} : {k: "KeyF"}); p.controles.push(mSel); }
-  else if(d.hacer === "stick"){ mSel = {tipo: "stick", x: .15, y: .65, t: .42, modo: xb ? "izq" : "wasd"}; p.controles.push(mSel); }
-  else if(d.hacer === "zona"){ mSel = {tipo: "zona", x: .6, y: .4, w: .27, h: .4, sens: xb ? 1 : 1.6, modo: xb ? "der" : "mouse", conClic: false}; p.controles.push(mSel); }
+  else if(d.hacer === "min"){ mMin = true; }
+  else if(d.hacer === "max"){ mMin = false; }
+  else if(d.hacer === "boton"){ mSel = bt(.5, .55, .15, xb ? {x: "A"} : {k: "KeyF"}); p.controles.push(mSel); nuevoM(); }
+  else if(d.hacer === "stick"){ mSel = {tipo: "stick", x: .15, y: .65, t: .42, modo: xb ? "izq" : "wasd"}; p.controles.push(mSel); nuevoM(); }
+  else if(d.hacer === "zona"){ mSel = {tipo: "zona", x: .6, y: .45, w: .27, h: .4, sens: xb ? 1 : 1.6, modo: xb ? "der" : "mouse", conClic: false}; p.controles.push(mSel); nuevoM(); }
   else if(d.hacer === "base"){
     if(!confirm("¿Volver a los botones de fábrica en este perfil?")) return;
     mandos.lista[mandos.sel] = Object.assign(xb ? mandoXbox() : mandoBase(), {nombre: p.nombre}); mSel = null;
@@ -3266,8 +3313,29 @@ $("mandoPanel").addEventListener("input", e => {
   if(r === "opacidad") mandoEl.style.setProperty("--op", o[r]);
   if(r === "sens" && o._el) o._el.firstChild && (o._el.innerHTML = textoZona(o) + '<div class="mh"></div>');
 });
+// Ventana de edición: se arrastra desde ⠿ y se achica con –.
+let mMin = false, posPanelM = null;
+function nuevoM(){ mMin = true; toast("Nuevo control en el centro: arrástralo donde quieras. «Opciones ▾» para elegir qué hace."); }
+function colocarPanelM(){
+  const pn = $("mandoPanel");
+  if(!posPanelM){ pn.style.left = ""; pn.style.top = ""; pn.style.transform = ""; return; }
+  const W = innerWidth, H = innerHeight, r = pn.getBoundingClientRect();
+  const x = Math.max(4, Math.min(W - Math.min(r.width, W - 8) - 4, posPanelM.x));
+  const y = Math.max(4, Math.min(H - 44, posPanelM.y));
+  pn.style.transform = "none"; pn.style.left = x + "px"; pn.style.top = y + "px";
+}
+$("mandoPanel").addEventListener("pointerdown", e => {
+  const cab = e.target.closest(".mpCab");
+  if(!cab || !(e.target.closest(".asa") || e.target.closest(".mpCab > b"))) return;
+  e.preventDefault();
+  const pn = $("mandoPanel"), r = pn.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+  try{ cab.setPointerCapture(e.pointerId); }catch(_){}
+  const mover = ev => { posPanelM = {x: ev.clientX - dx, y: ev.clientY - dy}; colocarPanelM(); };
+  const soltar = () => { cab.removeEventListener("pointermove", mover); cab.removeEventListener("pointerup", soltar); cab.removeEventListener("pointercancel", soltar); };
+  cab.addEventListener("pointermove", mover); cab.addEventListener("pointerup", soltar); cab.addEventListener("pointercancel", soltar);
+});
 function entrarEdicionM(){
-  mandoSoltar();
+  mandoSoltar(); mMin = false;
   respaldoM = JSON.parse(JSON.stringify(perfilM(), limpioM));
   mEdit = true; mSel = null; cerrarPopM();
   $("mandoPanel").classList.remove("oculto");
@@ -3302,14 +3370,14 @@ function pintarPanelMando(){
   const sel = velIndice(z);
   $("pbmVel").innerHTML = NOM_VEL.map((n, i) => `<button data-v="${i}" class="${i === sel ? "sel" : ""}"><i style="height:${6 + i * 5}px"></i>${n}</button>`).join("");
 }
-$("pbmPerfiles").addEventListener("click", e => {
+alTocar($("pbmPerfiles"), e => {
   const b = e.target.closest("button"); if(!b) return;
   if(b.dataset.salir){ ocultarBarra(); alternarMando(false); return; }
   mandoSoltar(); mandos.sel = +b.dataset.i; guardarMandos();
   pintarMando(); pintarPanelMando(); revisarXboxM();
   toast((perfilM().tipo === "xbox" ? "🎮 " : "⌨ ") + perfilM().nombre);
 });
-$("pbmVel").addEventListener("click", e => {
+alTocar($("pbmVel"), e => {
   const b = e.target.closest("button[data-v]"); if(!b) return;
   const z = zonaM(); if(!z) return;
   const i = +b.dataset.v;
@@ -3331,7 +3399,7 @@ function pintarPerfilesM(){
     `<hr><button data-p="nuevo">＋ Nuevo perfil (copia de este)</button><button data-p="nombre">✎ Cambiar nombre</button>` +
     (mandos.lista.length > 1 ? `<button data-p="borrar" style="color:#ff9a95">🗑 Borrar este perfil</button>` : "");
 }
-$("mandoPerfiles").addEventListener("click", e => {
+alTocar($("mandoPerfiles"), e => {
   const b = e.target.closest("button"); if(!b) return;
   mandoSoltar();
   if(b.dataset.i !== undefined){ mandos.sel = +b.dataset.i; }
@@ -3370,7 +3438,7 @@ function avisoMandoPC(m){
   else if(m.estado === "instalado"){ $("mandoAviso").classList.add("oculto"); toast("✓ Controlador instalado. Conectando el mando…"); mandarPad(true); }
   else if(m.estado === "error") avisoXboxM(`<b>No se pudo usar el mando Xbox</b><div class="nota">${escapar(m.msg || "Error desconocido")}</div><div class="acc"><button data-xb="teclas">Usar teclas</button><button class="azul" data-xb="cerrar">Cerrar</button></div>`);
 }
-$("mandoAviso").addEventListener("click", e => {
+alTocar($("mandoAviso"), e => {
   const b = e.target.closest("button[data-xb]"); if(!b) return;
   const a = b.dataset.xb;
   if(a === "instalar"){ enviar(["ginstalar"]); avisoXboxM(`<b>⏳ Bajando el instalador en la PC…</b><div class="nota">En un momento aparece el aviso de Windows en la PC.</div>`); return; }
