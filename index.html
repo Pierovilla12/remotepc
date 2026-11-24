@@ -837,6 +837,7 @@ const CALIDADES = {
   fluido:      {nombre:"Fluido",      desc:"60 FPS · 15 Mbps · misma red", fps:60, mbps:15},
   alta:        {nombre:"Alta",        desc:"60 FPS · 25 Mbps · por cable", fps:60, mbps:25},
   equilibrado: {nombre:"Equilibrado", desc:"60 FPS · 8 Mbps · WiFi",       fps:60, mbps:8},
+  celular:     {nombre:"Celular",     desc:"45 FPS · 8 Mbps · parejo en el celular", fps:45, mbps:8},
   ahorro:      {nombre:"Ahorro",      desc:"30 FPS · 3 Mbps · internet lento", fps:30, mbps:3},
 };
 const RESOLUCIONES = {
@@ -1297,6 +1298,7 @@ async function conectar(eq){
     }
     try{ r.jitterBufferTarget = 0; }catch(e){}
     try{ r.playoutDelayHint = 0; }catch(e){}
+    receptorVideo = r; reiniciarAntitraba();
     video.srcObject = ev.streams[0] || new MediaStream([ev.track]);
     video.play().catch(() => {});
     if(video.requestVideoFrameCallback){
@@ -1683,6 +1685,52 @@ $("transfer").addEventListener("click", ev => {
 }
 window.addEventListener("focus", () => { if(pc) revisarPortapapeles(); });
 
+// ---------------- Anti-congelones del equipo que mira ----------------
+// Si este equipo descarta cuadros o se congela, casi siempre es porque los
+// cuadros llegan a golpes (la PC está ocupada, por ejemplo con un juego, y su
+// codificador los saca a tirones) o porque no alcanza a mostrarlos. Sin búfer,
+// cada cuadro atrasado se tira, falta imagen y hay que pedir una completa: la
+// imagen se congela. Arreglo por pasos: primero un colchón chico al búfer
+// (40 → 80 ms) que absorbe los tirones; si sigue, menos FPS (→ 45 → 30) sin
+// cortar. Cuando va bien un buen rato, vuelve de a poco a lo pedido.
+let receptorVideo = null;
+const at = {colchon: 0, fps: 0, malos: [], buenos: 0};
+function reiniciarAntitraba(){ at.colchon = 0; at.fps = 0; at.malos = []; at.buenos = 0; }
+function ponerColchon(ms){
+  at.colchon = ms;
+  try{ if(receptorVideo) receptorVideo.jitterBufferTarget = ms; }catch(e){}
+  try{ if(receptorVideo) receptorVideo.playoutDelayHint = ms / 1000; }catch(e){}
+}
+function ponerFpsAntitraba(fps){
+  if(!actual || !funcionesHost.includes("ajustes")) return false;
+  const {q, alto} = calidadEfectiva(actual);
+  at.fps = fps >= q.fps ? 0 : fps;
+  fpsPedido = at.fps || q.fps; capFpsHost = null;
+  enviar(["ajustes", fpsPedido, q.mbps, alto]);
+  return true;
+}
+function antitraba(descartes, congelones){
+  if(!actual || !pc || document.hidden) return;
+  const ahora = Date.now();
+  const malo = congelones > 0 || descartes >= 3;
+  if(malo){ at.malos.push(ahora); at.buenos = 0; } else at.buenos++;
+  at.malos = at.malos.filter(x => ahora - x < 20000);
+  const n = at.malos.length, pedido = calidadEfectiva(actual).q.fps;
+  if(malo){
+    if(at.colchon < 40 && n >= 2) ponerColchon(40);
+    else if(at.colchon < 80 && n >= 4) ponerColchon(80);
+    else if(at.colchon >= 80 && n >= 7){
+      const ahoraFps = at.fps || pedido, menos = ahoraFps > 45 ? 45 : ahoraFps > 30 ? 30 : 0;
+      if(menos && ponerFpsAntitraba(menos)){ at.malos = []; toast(`La imagen se trababa: bajé a ${menos} FPS para que vaya pareja`); }
+    }
+  } else if(at.buenos >= 45){
+    // Todo bien 45 s seguidos: devolver un paso (primero FPS, después el búfer).
+    at.buenos = 0;
+    if(at.fps){ const mas = at.fps < 45 ? 45 : pedido; ponerFpsAntitraba(mas); }
+    else if(at.colchon) ponerColchon(at.colchon > 40 ? 40 : 0);
+  }
+}
+
 // ---------------- Estadísticas y vigilante ----------------
 let videoCodec = "";
 let contEstad = 0;
@@ -1725,6 +1773,8 @@ async function actualizarStats(){
     const perd = (inb.packetsLost || 0) - statsPrev.lost;
     if(perd > 0) det.push(perd + " paquetes perdidos");
     const recib = (inb.packetsReceived || 0) - (statsPrev.rec || 0);
+    antitraba((inb.framesDropped || 0) - (statsPrev.drop || 0), (inb.freezeCount || 0) - (statsPrev.frz || 0));
+    if(at.colchon || at.fps) det.push(`anti-congelones: búfer +${at.colchon} ms` + (at.fps ? ` · ${at.fps} FPS` : ""));
     controlar(recib + perd > 0 ? perd * 100 / (recib + perd) : 0);
     if(ctl && ctl.activo) det.push(`calidad auto ${(ctl.actual / 1000).toFixed(1)} de ${ctl.max / 1000} Mbps` + (ctl.cola != null ? ` · cola ${ctl.cola.toFixed(0)} ms` : ""));
     // Vigilante: si la ventana está visible y no llegan cuadros, reanudar o reconectar.
@@ -1772,7 +1822,8 @@ async function actualizarStats(){
   if(codificador) det.push("captura: " + codificador);
   $("bStats").title = det.join(" · ");
   statsPrev = {t, bytes: inb.bytesReceived, em: inb.jitterBufferEmittedCount || 0, jb: inb.jitterBufferDelay || 0,
-    fd: inb.framesDecoded || 0, dec: inb.totalDecodeTime || 0, lost: inb.packetsLost || 0, rec: inb.packetsReceived || 0, proc: inb.totalProcessingDelay || 0};
+    fd: inb.framesDecoded || 0, dec: inb.totalDecodeTime || 0, lost: inb.packetsLost || 0, rec: inb.packetsReceived || 0, proc: inb.totalProcessingDelay || 0,
+    drop: inb.framesDropped || 0, frz: inb.freezeCount || 0};
 }
 
 document.addEventListener("visibilitychange", () => { if(document.hidden) enviar(["x"]); else window.__alVolver(); });
@@ -2803,7 +2854,7 @@ function revisarEnlace(){
   $("fNombre").value = h.get("n") || "";
   $("fCodigo").value = fmtCodigo(cod);
   $("fAyuda").innerHTML = "¡Ya casi! Solo falta la <b>contraseña</b> que muestra “Esta PC” en esa computadora.";
-  selectorCalidad($("fCalidades"), tactil ? "equilibrado" : "fluido");
+  selectorCalidad($("fCalidades"), esAndroid ? "celular" : tactil ? "equilibrado" : "fluido");
   setTimeout(() => $("fClave").focus(), 120);
   return true;
 }
@@ -3518,6 +3569,13 @@ if(esAndroid){
 // ---------------- Arranque ----------------
 (async () => {
   await cargarConfig();
+  // App Android: las PCs que quedaron en "Equilibrado" (60 FPS) pasan una vez a
+  // "Celular" (45 FPS): la gráfica de la PC la da pareja y no se traba.
+  if(esAndroid && !config.celular45){
+    for(const eq of (config.equipos || [])) if(!eq.calidad || eq.calidad === "equilibrado") eq.calidad = "celular";
+    config.celular45 = true;
+    try{ await guardarConfig(); }catch(e){}
+  }
   if(!esApp && !(await esPaginaDelHost())) esNube = true;
   if(esApp || esNube){
     $("modoApp").classList.remove("oculto"); dibujarLista();
