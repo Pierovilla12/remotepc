@@ -1,0 +1,57 @@
+# Arma la app RemotoPC para Android (APK) y la publica en la release "android-app".
+# Corre sola cuando cambia la carpeta android/, o a mano: Actions → App Android → Run workflow.
+name: App Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Ícono y llave de firma
+        env:
+          LLAVE: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          mkdir -p android/app/src/main/res/drawable-nodpi
+          cp icono-512.png android/app/src/main/res/drawable-nodpi/icono.png
+          if [ -z "$LLAVE" ]; then
+            echo "::error::Falta el secreto ANDROID_KEYSTORE_B64 (Settings → Secrets and variables → Actions)"
+            exit 1
+          fi
+          echo "$LLAVE" | base64 -d > android/firma.jks
+
+      - name: Armar el APK
+        run: gradle -p android assembleRelease -Pcodigo=${{ github.run_number }} --no-daemon --stacktrace
+
+      - name: Publicar en la release android-app
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk RemotoPC-android.apk
+          SUMA=$(sha256sum RemotoPC-android.apk | cut -d' ' -f1)
+          NOTAS="RemotoPC para Android, versión 1.0.${{ github.run_number }}. Descarga RemotoPC-android.apk en el celular e instálalo. sha256: $SUMA"
+          if ! gh release view android-app >/dev/null 2>&1; then
+            gh release create android-app --title "RemotoPC para Android" --notes "$NOTAS" --prerelease --latest=false
+          fi
+          gh release upload android-app RemotoPC-android.apk --clobber
+          gh release edit android-app --notes "$NOTAS" --prerelease --latest=false
