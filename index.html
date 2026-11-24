@@ -1394,18 +1394,20 @@ function cuadroLlego(meta){
   ctl.ultimaD = d;
   ctl.muestras.push(d);
 }
-// Versión web (la página de GitHub en un navegador): máximo 720p, 30 FPS y
-// 8 Mbps, para que vaya liviana en cualquier navegador y conexión.
-const WEB_MAX = {fps: 30, mbps: 8, alto: 720};
+// Versión web (la página de GitHub en un navegador) y celulares: máximo 720p,
+// 45 FPS y 8 Mbps, para que vaya liviana en cualquier navegador y conexión.
+const WEB_MAX = {fps: 45, mbps: 8, alto: 720};
 const CALIDADES_WEB = {
-  fluido:      {nombre: "Fluido",      desc: "30 FPS · 8 Mbps · buena conexión", fps: 30, mbps: 8},
-  equilibrado: {nombre: "Equilibrado", desc: "30 FPS · 5 Mbps · WiFi",           fps: 30, mbps: 5},
+  fluido:      {nombre: "Fluido",      desc: "45 FPS · 8 Mbps · buena conexión", fps: 45, mbps: 8},
+  equilibrado: {nombre: "Equilibrado", desc: "45 FPS · 5 Mbps · WiFi",           fps: 45, mbps: 5},
   ahorro:      {nombre: "Ahorro",      desc: "30 FPS · 3 Mbps · internet lento", fps: 30, mbps: 3},
 };
-const calidadesMenu = () => esNube ? CALIDADES_WEB : CALIDADES;
+// limitado: web en el navegador o pantalla táctil (celular/tablet).
+const limitado = () => esNube || (typeof tactil !== "undefined" && tactil && !esApp);
+const calidadesMenu = () => limitado() ? CALIDADES_WEB : CALIDADES;
 function calidadEfectiva(eq){
   let alto = (RESOLUCIONES[eq.resolucion] || RESOLUCIONES.nativa).alto;
-  if(!esNube) return {q: CALIDADES[eq.calidad] || CALIDADES.fluido, alto};
+  if(!limitado()) return {q: CALIDADES[eq.calidad] || CALIDADES.fluido, alto};
   if(!alto || alto > WEB_MAX.alto) alto = WEB_MAX.alto;
   return {q: CALIDADES_WEB[eq.calidad] || CALIDADES_WEB.fluido, alto};
 }
@@ -1917,10 +1919,10 @@ function dibujarMenuCalidad(){
     if(aplicarEnVivo()) toast(msg);
     else { toast(msg); conectar(actual); }
   };
-  if(esNube) m.insertAdjacentHTML("beforeend", '<div class="nota-web">Versión web: hasta 720p y 30 FPS. Para más calidad, usa la app RemotoPC.</div>');
+  if(limitado()) m.insertAdjacentHTML("beforeend", '<div class="nota-web">Versión web y celular: hasta 720p y 45 FPS. Para más calidad, usa la app RemotoPC.</div>');
   for(const [k, v] of Object.entries(calidadesMenu())){
     const b = document.createElement("button");
-    const elegida = esNube ? (CALIDADES_WEB[actual && actual.calidad] ? actual.calidad : "fluido") : (actual && actual.calidad) || "fluido";
+    const elegida = limitado() ? (CALIDADES_WEB[actual && actual.calidad] ? actual.calidad : "fluido") : (actual && actual.calidad) || "fluido";
     if(elegida === k) b.className = "sel";
     b.innerHTML = `<span>${v.nombre}</span><small>${v.desc}</small>`;
     b.onclick = () => { actual.calidad = k; guardarYReconectar("Calidad: " + v.nombre); };
@@ -1951,9 +1953,9 @@ function dibujarMenuCalidad(){
   }
   m.insertAdjacentHTML("beforeend", '<div class="tit" style="margin-top:6px">Resolución</div>');
   for(const [k, v] of Object.entries(RESOLUCIONES)){
-    if(esNube && !(v.alto && v.alto <= WEB_MAX.alto)) continue; // web: hasta 720p
+    if(limitado() && !(v.alto && v.alto <= WEB_MAX.alto)) continue; // web y celular: hasta 720p
     const b = document.createElement("button");
-    const sel = esNube ? (actual && calidadEfectiva(actual).alto === v.alto) : (actual && (actual.resolucion || "nativa") === k);
+    const sel = limitado() ? (actual && calidadEfectiva(actual).alto === v.alto) : (actual && (actual.resolucion || "nativa") === k);
     if(sel) b.className = "sel";
     b.innerHTML = `<span>${v.nombre}</span><small>${v.desc}</small>`;
     b.onclick = () => { actual.resolucion = k; guardarYReconectar("Resolución: " + v.nombre); };
