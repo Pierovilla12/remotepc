@@ -398,10 +398,6 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
 #mando.edit .mc.sel{outline:3px solid #4c8dff}
 #mando.edit .mh{display:block}
 #mando.edit::before{content:"";position:absolute;inset:0;background:rgba(5,8,14,.45);pointer-events:none}
-#mandoBarra{position:absolute;left:calc(50% + 36px);top:8px;z-index:8;display:flex;gap:6px;align-items:center;
-  background:rgba(10,14,20,.62);border:1px solid rgba(255,255,255,.16);padding:4px;border-radius:99px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-#mandoBarra button{border:0;background:rgba(255,255,255,.1);color:#e8eef8;font-size:12px;padding:6px 11px;border-radius:99px;max-width:170px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#mandoBarra button.azul{background:#4c8dff;color:#fff;font-weight:700}
 #mandoPanel{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:9;width:min(430px,calc(100% - 16px));max-height:calc(100% - 64px);overflow-y:auto;
   background:#121821;border:1px solid var(--borde2);border-radius:16px;padding:12px 14px;color:var(--texto);font-size:12.5px;box-shadow:0 20px 60px rgba(0,0,0,.5);transition:opacity .15s}
 #mandoPanel.tenue{opacity:.15;pointer-events:none}
@@ -416,9 +412,27 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
 #mandoPanel .acc button.rojo{color:#ff9a95}
 #mandoPanel input[type=range]{flex:1;accent-color:#4c8dff}
 #mandoPanel .nota{color:var(--suave);margin:2px 0 8px}
-#mandoPerfiles{position:absolute;left:calc(50% + 36px);top:52px;max-height:calc(100% - 60px);overflow-y:auto;z-index:9;min-width:240px;background:#121821;border:1px solid var(--borde2);border-radius:14px;padding:6px;color:var(--texto);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#mandoPerfiles{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-height:calc(100% - 60px);overflow-y:auto;z-index:9;min-width:240px;background:#121821;border:1px solid var(--borde2);border-radius:14px;padding:6px;color:var(--texto);box-shadow:0 20px 60px rgba(0,0,0,.5)}
 #mandoPerfiles button{display:block;width:100%;text-align:left;border:0;background:none;color:var(--texto);padding:9px 10px;border-radius:9px;font-size:13px}
 #mandoPerfiles button.sel{background:rgba(76,141,255,.16);color:#9cc0ff}
+#mandoAviso{position:absolute;left:calc(50% + 36px);top:52px;z-index:9;width:min(330px,calc(50% - 44px));min-width:250px;background:#121821;border:1px solid var(--borde2);border-radius:14px;padding:12px;color:var(--texto);font-size:12.5px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#mandoAviso{left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 24px))}
+#mandoAviso .nota{color:var(--suave);margin-top:6px;line-height:1.45}
+#mandoAviso .acc{display:flex;gap:8px;margin-top:12px}
+#mandoAviso .acc button{flex:1;border:1px solid var(--borde2);background:#1d2635;color:var(--texto);border-radius:10px;padding:9px 6px}
+#mandoAviso .acc button.azul{background:#4c8dff;border-color:#4c8dff;color:#fff;font-weight:700}
+#mando .mz small{opacity:.75}
+#pbMando{margin:8px 0;padding:10px;border:1px solid rgba(76,141,255,.35);border-radius:12px;background:rgba(76,141,255,.07)}
+#pbMando .pbm-tit{font-weight:700;margin-bottom:8px}
+#pbMando .pbm-tit2{color:var(--suave);font-size:12px;margin:10px 0 6px}
+.pbm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pbm-chips button,.pbm-acc button{border:1px solid var(--borde2);background:#1d2635;color:var(--texto);border-radius:9px;padding:8px 9px;font-size:12.5px}
+.pbm-chips button.sel{background:#4c8dff;border-color:#4c8dff;color:#fff;font-weight:700}
+.pbm-vel{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.pbm-vel button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;border:1px solid var(--borde2);background:#1d2635;color:var(--texto);border-radius:9px;padding:7px 1px 6px;font-size:10px;line-height:1.1;min-height:56px}
+.pbm-vel button i{display:block;width:9px;border-radius:3px;background:currentColor;opacity:.75}
+.pbm-vel button.sel{background:#4c8dff;border-color:#4c8dff;color:#fff;font-weight:700}
+.pbm-acc{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
 #mandoPerfiles hr{border:0;border-top:1px solid var(--borde);margin:4px 0}
 </style>
 </head>
@@ -704,6 +718,13 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
       <div><b id="sMbps">–</b><small>Mbps</small></div>
     </div>
     <div class="pb-retraso" id="sRetraso">Retraso: midiendo…</div>
+    <div id="pbMando" class="oculto">
+      <div class="pbm-tit">🎮 Mando en pantalla</div>
+      <div class="pbm-chips" id="pbmPerfiles"></div>
+      <div class="pbm-tit2">Velocidad de la cámara</div>
+      <div class="pbm-vel" id="pbmVel"></div>
+      <div class="pbm-acc"><button id="pbmEditar">✎ Mover botones</button><button id="pbmMas">⋯ Perfiles</button></div>
+    </div>
     <div class="pb-grid">
       <button class="pbb" id="bFull"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Pantalla completa</span></button>
       <button class="pbb" id="bJuego"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 11v3M5.5 12.5h3M15 12h.01M18 13h.01"/></svg><span>Modo juego</span></button>
@@ -723,7 +744,7 @@ details.qr-local summary{font-size:12.5px;color:var(--suave);cursor:pointer}
     <div class="menu-b oculto" id="menuCalidad"></div>
   </div>
   <div id="mando" class="oculto"></div>
-  <div id="mandoBarra" class="oculto"><button id="mPerfil">⌨ Teclas</button><button id="mEditar">✎ Editar</button><button id="mCerrar">✕</button></div>
+  <div id="mandoAviso" class="oculto"></div>
   <div id="mandoPerfiles" class="oculto"></div>
   <div id="mandoPanel" class="oculto"></div>
   <div id="cursorT" class="oculto"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1 3.8 7.4-2.8 1.4-3.8-7.4L4 20z" fill="#fff" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg></div>
@@ -1238,6 +1259,7 @@ async function conectar(eq){
       formasHost = m.formas || []; formaHost = m.forma || ""; $("bBuscarForma").classList.toggle("oculto", !funcionesHost.includes("formas") || formasHost.length < 2); }
     if(m.t === "forma") respuestaForma(m);
     if(m.t === "cap") capFpsHost = m.fps;
+    if(m.t === "mando" && typeof avisoMandoPC === "function") avisoMandoPC(m);
     if(m.t === "clip") recibirClipTexto(m.texto);
     if(m.t === "reconectar" && pc === miPc){ if(m.motivo === "h264") sinH265 = true; reconectarYa(); }
     if(m.t === "cursor"){ cursorRemoto = m.c; if(!bloqueado()) capa.style.cursor = m.c; pintarCursorT(); }
@@ -2914,10 +2936,12 @@ setInterval(pintarCursorT, 250);
 window.addEventListener("resize", pintarCursorT);
 
 // ================= Modo mando (celular) =================
-// Botones transparentes encima del juego, como PPSSPP. Cada botón manda una
-// tecla o un clic a la PC (el mismo teclado y mouse de siempre: no hace falta
-// instalar nada allá). El stick manda W/A/S/D (o las flechas) y la zona de
-// cámara mueve el mouse. Los perfiles (uno por juego) se guardan en este celular.
+// Botones transparentes encima del juego, como PPSSPP. Dos tipos de perfil:
+//  · "Teclas": cada botón manda una tecla o un clic (el teclado y mouse de
+//    siempre; no hace falta instalar nada en la PC).
+//  · "Mando Xbox": la PC ve un mando Xbox 360 de verdad (sticks analógicos,
+//    gatillos…). Necesita el controlador ViGEmBus en la PC (se instala una vez).
+// Los perfiles (uno por juego) se guardan en este celular.
 const TECLAS_M = [
   ["Escape","Esc"],["Digit1","1"],["Digit2","2"],["Digit3","3"],["Digit4","4"],["Digit5","5"],["Digit6","6"],["Digit7","7"],["Digit8","8"],["Digit9","9"],["Digit0","0"],
   ["KeyQ","Q"],["KeyW","W"],["KeyE","E"],["KeyR","R"],["KeyT","T"],["KeyY","Y"],["KeyU","U"],["KeyI","I"],["KeyO","O"],["KeyP","P"],
@@ -2927,53 +2951,108 @@ const TECLAS_M = [
   ["ArrowUp","↑"],["ArrowDown","↓"],["ArrowLeft","←"],["ArrowRight","→"],["F1","F1"],["F2","F2"],["F3","F3"],["F4","F4"],["F5","F5"]
 ];
 const OTRAS_M = [["Clic izq.", {b:0}], ["Clic der.", {b:2}], ["Clic medio", {b:1}], ["Rueda ↑", {w:120}], ["Rueda ↓", {w:-120}], ["Teclado ⌨", {teclado:true}]];
+// Botones de mando Xbox (bits de XInput). LT/RT son gatillos (0..255).
+const XBOX_M = {A: 0x1000, B: 0x2000, X: 0x4000, Y: 0x8000, LB: 0x0100, RB: 0x0200, LT: 0, RT: 0,
+  "⧉": 0x0020, "☰": 0x0010, L3: 0x0040, R3: 0x0080, "▲": 0x0001, "▼": 0x0002, "◀": 0x0004, "▶": 0x0008};
+const COLOR_X = {A: "#8ff0a4", B: "#ff8f8f", X: "#8fc3ff", Y: "#ffe08f"};
 function etqM(a){
   if(!a) return "?";
+  if(a.x) return a.x;
   if(a.teclado) return "⌨";
   if(a.b === 0) return "Clic"; if(a.b === 2) return "Der."; if(a.b === 1) return "Medio";
-  if(a.w > 0) return "▲"; if(a.w < 0) return "▼";
+  if(a.w > 0) return "Rueda▲"; if(a.w < 0) return "Rueda▼";
   const f = TECLAS_M.find(t => t[0] === a.k); return f ? f[1] : (a.k || "?");
 }
 const bt = (x, y, t, a, forma) => ({tipo: "boton", x, y, t, a, forma: forma || "redondo"});
 function mandoBase(){
-  return {nombre: "Teclas (WASD)", opacidad: .6, vibrar: true, controles: [
-    {tipo: "stick", x: .14, y: .66, t: .44, flechas: false},
-    {tipo: "zona", x: .6, y: .36, w: .27, h: .4, sens: 1.6, conClic: false},
+  return {nombre: "Teclas (WASD)", tipo: "teclas", opacidad: .6, vibrar: true, controles: [
+    {tipo: "stick", x: .14, y: .66, t: .44, modo: "wasd"},
+    {tipo: "zona", x: .6, y: .36, w: .27, h: .4, sens: 1.6, modo: "mouse", conClic: false},
     bt(.885, .7, .2, {b: 0}), bt(.785, .78, .15, {k: "KeyF"}), bt(.81, .5, .15, {k: "Space"}),
     bt(.9, .38, .15, {k: "KeyE"}), bt(.96, .6, .12, {k: "KeyQ"}), bt(.27, .85, .13, {k: "ShiftLeft"}),
     bt(.47, .9, .1, {k: "Digit1"}, "cuadro"), bt(.53, .9, .1, {k: "Digit2"}, "cuadro"), bt(.59, .9, .1, {k: "Digit3"}, "cuadro"), bt(.65, .9, .1, {k: "Digit4"}, "cuadro"),
     bt(.05, .12, .1, {k: "Escape"}, "cuadro"), bt(.12, .12, .1, {k: "KeyM"}, "cuadro"), bt(.19, .12, .1, {k: "Tab"}, "cuadro"),
-    bt(.95, .12, .1, {teclado: true}, "cuadro")
+    bt(.95, .25, .1, {teclado: true}, "cuadro")
+  ]};
+}
+function mandoXbox(){
+  const x = (n, X, Y, t, forma) => bt(X, Y, t, {x: n}, forma);
+  return {nombre: "Mando Xbox", tipo: "xbox", opacidad: .6, vibrar: true, controles: [
+    {tipo: "stick", x: .14, y: .62, t: .42, modo: "izq"},
+    {tipo: "zona", x: .6, y: .48, w: .3, h: .44, sens: 1, modo: "der", conClic: false},
+    x("A", .87, .78, .16), x("B", .945, .6, .16), x("X", .795, .6, .16), x("Y", .87, .42, .16),
+    x("LB", .07, .22, .1, "cuadro"), x("LT", .16, .22, .1, "cuadro"), x("RT", .84, .22, .1, "cuadro"), x("RB", .93, .22, .1, "cuadro"),
+    x("⧉", .4, .9, .09, "cuadro"), x("☰", .6, .9, .09, "cuadro"),
+    x("▲", .3, .62, .09, "cuadro"), x("◀", .245, .76, .09, "cuadro"), x("▶", .355, .76, .09, "cuadro"), x("▼", .3, .9, .09, "cuadro"),
+    x("L3", .07, .92, .09), x("R3", .7, .92, .09)
   ]};
 }
 let mandos = null;
 try{ mandos = JSON.parse(localStorage.getItem("rpcMandos") || "null"); }catch(e){}
 if(!mandos || !Array.isArray(mandos.lista) || !mandos.lista.length) mandos = {sel: 0, lista: [mandoBase()]};
+// Perfiles guardados con la versión anterior: completar campos nuevos.
+for(const p of mandos.lista){
+  p.tipo = p.tipo || "teclas";
+  for(const c of p.controles){
+    if(c.tipo === "stick" && !c.modo) c.modo = c.flechas ? "flechas" : "wasd";
+    if(c.tipo === "zona" && !c.modo) c.modo = "mouse";
+  }
+}
+if(!mandos.xbox){ mandos.lista.push(mandoXbox()); mandos.xbox = true; }
 if(!(mandos.sel >= 0 && mandos.sel < mandos.lista.length)) mandos.sel = 0;
-const guardarMandos = () => { try{ localStorage.setItem("rpcMandos", JSON.stringify(mandos, (k, v) => k.startsWith("_") ? undefined : v)); }catch(e){} };
+const limpioM = (k, v) => k.startsWith("_") ? undefined : v;
+const guardarMandos = () => { try{ localStorage.setItem("rpcMandos", JSON.stringify(mandos, limpioM)); }catch(e){} };
 const perfilM = () => mandos.lista[mandos.sel];
 let mandoOn = false, mEdit = false, mSel = null, respaldoM = null;
 const mandoEl = $("mando");
 const vibM = () => { if(perfilM().vibrar){ try{ navigator.vibrate && navigator.vibrate(12); }catch(e){} } };
 
+// ---------- Estado del mando Xbox (se manda completo varias veces por segundo) ----------
+const pad = {b: 0, lt: 0, rt: 0, lx: 0, ly: 0, rx: 0, ry: 0};
+let padUlt = "", padTimer = null, padActivo = false;
+function mandarPad(forzar){
+  const m = ["g", pad.b, pad.lt, pad.rt, Math.round(pad.lx), Math.round(pad.ly), Math.round(pad.rx), Math.round(pad.ry)];
+  const t = m.join();
+  if(!forzar && t === padUlt) return;
+  padUlt = t; padActivo = true;
+  enviarMov(m);
+}
+let padPend = false;
+function padCambio(){ if(!padPend){ padPend = true; setTimeout(() => { padPend = false; mandarPad(false); }, 8); } }
+setInterval(() => { if(mandoOn && perfilM().tipo === "xbox" && visorActivo() && !mEdit) mandarPad(true); }, 100);
+function soltarPad(){
+  Object.assign(pad, {b: 0, lt: 0, rt: 0, lx: 0, ly: 0, rx: 0, ry: 0});
+  if(padActivo){ mandarPad(true); enviar(["g0"]); padActivo = false; padUlt = ""; }
+}
+
 function accionM(a, abajo){
   if(!a) return;
+  if(a.x){
+    if(a.x === "LT") pad.lt = abajo ? 255 : 0;
+    else if(a.x === "RT") pad.rt = abajo ? 255 : 0;
+    else { const bit = XBOX_M[a.x] || 0; pad.b = abajo ? pad.b | bit : pad.b & ~bit; }
+    padCambio(); return;
+  }
   if(a.teclado){ if(abajo){ restaurarT(); tecladoT.focus(); } return; }
   if(a.k) enviar(["k", a.k, abajo ? 1 : 0]);
   else if(a.b !== undefined) enviar([abajo ? "d" : "u", a.b]);
   else if(a.w && abajo) enviar(["w", a.w]);
 }
+const teclasStick = c => c.modo === "flechas" ? ["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"] : ["KeyW", "KeyA", "KeyS", "KeyD"];
+const stickAnalogico = c => c.modo === "izq" || c.modo === "der";
 // Suelta todo lo que esté apretado (al salir, al editar o si se corta).
 function mandoSoltar(){
   for(const c of (mandos.lista[mandos.sel] || {controles: []}).controles){
     if(c._on){ accionM(c.a, false); c._on = false; }
     if(c._set){ c._set.forEach(i => enviar(["k", teclasStick(c)[i], 0])); c._set = null; }
     if(c._clic){ enviar(["u", 0]); c._clic = false; }
+    c._z = null;
   }
-  mandoEl.querySelectorAll(".pres").forEach(e => e.classList.remove("pres"));
+  soltarPad();
+  mandoEl.querySelectorAll(".pres,.activa").forEach(e => e.classList.remove("pres", "activa"));
 }
-const teclasStick = c => c.flechas ? ["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"] : ["KeyW", "KeyA", "KeyS", "KeyD"];
 
+const textoZona = c => c.modo === "der" ? `arrastra aquí<br>para mover la cámara` : `arrastra aquí<br>para mover la cámara<br><small>toque corto = clic</small>`;
 function pintarMando(){
   const p = perfilM();
   mandoEl.innerHTML = "";
@@ -2992,16 +3071,18 @@ function pintarMando(){
       el.className = "mc mb " + (c.forma === "cuadro" ? "cuadro" : "");
       const txt = etqM(c.a);
       el.textContent = txt;
-      el.style.fontSize = Math.max(11, Math.min(h * .36, h * 1.5 / Math.max(1, txt.length))) + "px";
+      if(c.a && COLOR_X[c.a.x]) el.style.color = COLOR_X[c.a.x];
+      el.style.fontSize = Math.max(11, Math.min(h * .38, h * 1.5 / Math.max(1, txt.length))) + "px";
       if(c._on) el.classList.add("pres");
     } else if(c.tipo === "stick"){
       el.className = "mc ms";
-      const t = c.flechas ? ["↑", "←", "↓", "→"] : ["W", "A", "S", "D"];
+      const t = c.modo === "flechas" ? ["↑", "←", "↓", "→"] : c.modo === "wasd" ? ["W", "A", "S", "D"] : ["", "", "", ""];
       el.innerHTML = `<i></i><span style="left:50%;top:5%;transform:translateX(-50%)">${t[0]}</span><span style="left:6%;top:50%;transform:translateY(-50%)">${t[1]}</span>` +
-        `<span style="left:50%;bottom:5%;transform:translateX(-50%)">${t[2]}</span><span style="right:6%;top:50%;transform:translateY(-50%)">${t[3]}</span>`;
+        `<span style="left:50%;bottom:5%;transform:translateX(-50%)">${t[2]}</span><span style="right:6%;top:50%;transform:translateY(-50%)">${t[3]}</span>` +
+        (stickAnalogico(c) ? `<span style="left:50%;top:50%;transform:translate(-50%,-50%);opacity:.7">${c.modo === "izq" ? "L" : "R"}</span>` : "");
     } else {
       el.className = "mc mz";
-      el.innerHTML = "arrastra = mover el mouse (cámara)<br>toque corto = clic";
+      el.innerHTML = textoZona(c);
     }
     if(mEdit){ const m = document.createElement("div"); m.className = "mh"; el.appendChild(m); }
     if(c === mSel) el.classList.add("sel");
@@ -3012,7 +3093,6 @@ function pintarMando(){
 }
 
 function conectarControl(el, c){
-  let z = null;
   el.addEventListener("pointerdown", e => {
     e.preventDefault(); e.stopPropagation();
     try{ el.setPointerCapture(e.pointerId); }catch(_){}
@@ -3022,31 +3102,28 @@ function conectarControl(el, c){
       if(c.mantener){ c._on = !c._on; accionM(c.a, c._on); el.classList.toggle("pres", c._on); }
       else { c._on = true; accionM(c.a, true); el.classList.add("pres"); }
       vibM();
-    } else if(c.tipo === "stick"){ c._set = c._set || new Set(); moverStick(c, el, e); }
-    else { z = {x: e.clientX, y: e.clientY, t0: Date.now(), movio: false}; el.classList.add("activa"); }
+    } else if(c.tipo === "stick"){ c._set = c._set || new Set(); c._act = true; moverStick(c, el, e); }
+    else { c._z = {x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, t0: Date.now(), movio: false}; el.classList.add("activa"); }
   });
   el.addEventListener("pointermove", e => {
     if(mEdit) return;
-    if(c.tipo === "stick" && c._set) moverStick(c, el, e);
-    else if(c.tipo === "zona" && z){
-      const dx = e.clientX - z.x, dy = e.clientY - z.y;
-      if(!z.movio && Math.hypot(dx, dy) < 6) return;
-      if(!z.movio){ z.movio = true; if(c.conClic){ enviar(["d", 0]); c._clic = true; } }
-      enviarRel(dx * c.sens, dy * c.sens);
-      z.x = e.clientX; z.y = e.clientY;
-    }
+    if(c.tipo === "stick" && c._act) moverStick(c, el, e);
+    else if(c.tipo === "zona" && c._z) moverZona(c, e);
   });
   const fin = () => {
     if(mEdit) return;
     if(c.tipo === "boton" && !c.mantener && c._on){ c._on = false; accionM(c.a, false); el.classList.remove("pres"); }
-    else if(c.tipo === "stick" && c._set){
-      const tk = teclasStick(c);
-      c._set.forEach(i => enviar(["k", tk[i], 0])); c._set = null;
+    else if(c.tipo === "stick" && c._act){
+      c._act = false;
+      if(c._set){ const tk = teclasStick(c); c._set.forEach(i => enviar(["k", tk[i], 0])); c._set.clear(); }
+      if(c.modo === "izq"){ pad.lx = pad.ly = 0; padCambio(); }
+      if(c.modo === "der"){ pad.rx = pad.ry = 0; padCambio(); }
       el.querySelector("i").style.transform = "";
-    } else if(c.tipo === "zona" && z){
+    } else if(c.tipo === "zona" && c._z){
+      const z = c._z; c._z = null; el.classList.remove("activa");
+      if(c.modo === "der"){ pad.rx = pad.ry = 0; padCambio(); return; }
       if(c._clic){ enviar(["u", 0]); c._clic = false; }
       else if(!z.movio && Date.now() - z.t0 < 300){ enviar(["d", 0]); enviar(["u", 0]); }
-      z = null; el.classList.remove("activa");
     }
   };
   el.addEventListener("pointerup", fin);
@@ -3054,13 +3131,20 @@ function conectarControl(el, c){
   el.addEventListener("contextmenu", e => e.preventDefault());
 }
 
-// Stick: 8 direcciones. Pasado el centro (zona muerta) aprieta las teclas de la
-// dirección; en diagonal, dos a la vez (W+D).
+// Stick: analógico (mando Xbox) o 8 direcciones con teclas (W+D en diagonal).
 function moverStick(c, el, e){
   const r = el.getBoundingClientRect(), rad = r.width / 2;
   const dx = e.clientX - (r.left + rad), dy = e.clientY - (r.top + rad), d = Math.hypot(dx, dy);
-  const k = d > rad * .6 ? rad * .6 / d : 1;
+  const lim = rad * .6, k = d > lim ? lim / d : 1;
   el.querySelector("i").style.transform = `translate(${dx * k}px,${dy * k}px)`;
+  if(stickAnalogico(c)){
+    let fx = dx / lim, fy = dy / lim; const f = Math.hypot(fx, fy);
+    if(f > 1){ fx /= f; fy /= f; }
+    if(f < .12){ fx = fy = 0; }
+    if(c.modo === "izq"){ pad.lx = fx * 32767; pad.ly = -fy * 32767; }
+    else { pad.rx = fx * 32767; pad.ry = -fy * 32767; }
+    padCambio(); return;
+  }
   const quiere = new Set();
   if(d > rad * .25){
     const ux = dx / d, uy = dy / d;
@@ -3072,6 +3156,24 @@ function moverStick(c, el, e){
   c._set.forEach(i => { if(!quiere.has(i)){ enviar(["k", tk[i], 0]); c._set.delete(i); cambio = true; } });
   quiere.forEach(i => { if(!c._set.has(i)){ enviar(["k", tk[i], 1]); c._set.add(i); cambio = true; } });
   if(cambio && quiere.size) vibM();
+}
+// Zona de cámara: mueve el mouse, o hace de stick derecho que sigue al dedo
+// (desde donde tocaste; la sensibilidad decide cuánto hay que arrastrar).
+function moverZona(c, e){
+  const z = c._z;
+  if(c.modo === "der"){
+    const alcance = 70 / Math.max(.2, c.sens);
+    let fx = (e.clientX - z.x0) / alcance, fy = (e.clientY - z.y0) / alcance;
+    const f = Math.hypot(fx, fy);
+    if(f > 1){ fx /= f; fy /= f; z.x0 = e.clientX - fx * alcance; z.y0 = e.clientY - fy * alcance; } // el centro sigue al dedo
+    pad.rx = fx * 32767; pad.ry = -fy * 32767; padCambio();
+    return;
+  }
+  const dx = e.clientX - z.x, dy = e.clientY - z.y;
+  if(!z.movio && Math.hypot(dx, dy) < 6) return;
+  if(!z.movio){ z.movio = true; if(c.conClic){ enviar(["d", 0]); c._clic = true; } }
+  enviarRel(dx * c.sens, dy * c.sens);
+  z.x = e.clientX; z.y = e.clientY;
 }
 
 // ---------- Editar: mover, cambiar tamaño, elegir qué manda cada botón ----------
@@ -3100,21 +3202,26 @@ function empezarEdicionM(e, el, c){
   addEventListener("pointermove", mover); addEventListener("pointerup", soltar); addEventListener("pointercancel", soltar);
 }
 
+const chipsM = (lista, sel, attr) => `<div class="chips">` + lista.map(([v, t]) => `<button data-${attr}="${v}" class="${v === sel ? "sel" : ""}">${t}</button>`).join("") + `</div>`;
 function pintarPanelM(){
-  const p = perfilM(), pn = $("mandoPanel");
+  const p = perfilM(), pn = $("mandoPanel"), xb = p.tipo === "xbox";
   let h = `<h5>✎ Editando «${escapar(p.nombre)}»</h5><div class="nota">Toca un control para elegirlo · arrástralo para moverlo · cuadrito verde = tamaño</div>`;
   if(mSel && mSel.tipo === "boton"){
     const a = mSel.a || {};
-    h += `<b>Este botón manda:</b><div class="chips">` +
-      OTRAS_M.map((o, i) => `<button data-otra="${i}" class="${JSON.stringify(o[1]) === JSON.stringify(a) ? "sel" : ""}">${o[0]}</button>`).join("") + `</div>` +
-      `<div class="chips">` + TECLAS_M.map(t => `<button data-k="${t[0]}" class="${a.k === t[0] ? "sel" : ""}">${t[1]}</button>`).join("") + `</div>` +
-      `<div class="fila"><span>Forma</span><div class="chips" style="margin:0"><button data-forma="redondo" class="${mSel.forma !== "cuadro" ? "sel" : ""}">● Redondo</button><button data-forma="cuadro" class="${mSel.forma === "cuadro" ? "sel" : ""}">■ Cuadrado</button></div></div>` +
+    h += `<b>Este botón manda:</b>`;
+    const bx = `<div class="chips">` + Object.keys(XBOX_M).map(n => `<button data-x="${n}" class="${a.x === n ? "sel" : ""}">${n}</button>`).join("") + `</div>`;
+    const otras = `<div class="chips">` + OTRAS_M.map((o, i) => `<button data-otra="${i}" class="${JSON.stringify(o[1]) === JSON.stringify(a) ? "sel" : ""}">${o[0]}</button>`).join("") + `</div>`;
+    const teclas = `<div class="chips">` + TECLAS_M.map(t => `<button data-k="${t[0]}" class="${a.k === t[0] ? "sel" : ""}">${t[1]}</button>`).join("") + `</div>`;
+    h += xb ? `<div class="nota" style="margin:6px 0 0">Botones del mando</div>${bx}<div class="nota" style="margin:6px 0 0">O una tecla / clic</div>${otras}${teclas}`
+            : `${otras}${teclas}<div class="nota" style="margin:6px 0 0">Botones del mando Xbox</div>${bx}`;
+    h += `<div class="fila"><span>Forma</span><div class="chips" style="margin:0"><button data-forma="redondo" class="${mSel.forma !== "cuadro" ? "sel" : ""}">● Redondo</button><button data-forma="cuadro" class="${mSel.forma === "cuadro" ? "sel" : ""}">■ Cuadrado</button></div></div>` +
       `<div class="fila"><span>Queda apretado hasta tocarlo otra vez<br><small style="color:var(--suave)">(para correr, agacharse…)</small></span><button class="sw ${mSel.mantener ? "on" : ""}" data-sw="mantener"></button></div>`;
   } else if(mSel && mSel.tipo === "stick"){
-    h += `<b>El stick manda:</b><div class="chips"><button data-flechas="0" class="${!mSel.flechas ? "sel" : ""}">W A S D</button><button data-flechas="1" class="${mSel.flechas ? "sel" : ""}">Flechas ↑←↓→</button></div>`;
+    h += `<b>El stick manda:</b>` + chipsM([["izq", "Stick izquierdo (mando)"], ["der", "Stick derecho (mando)"], ["wasd", "W A S D"], ["flechas", "Flechas ↑←↓→"]], mSel.modo, "modo");
   } else if(mSel && mSel.tipo === "zona"){
-    h += `<b>Zona de cámara</b><div class="fila"><span>Sensibilidad</span><input type="range" min="0.3" max="5" step="0.1" value="${mSel.sens}" data-rango="sens"><span>${(+mSel.sens).toFixed(1)}</span></div>` +
-      `<div class="fila"><span>Mantener clic al arrastrar<br><small style="color:var(--suave)">(juegos donde la cámara gira arrastrando)</small></span><button class="sw ${mSel.conClic ? "on" : ""}" data-sw="conClic"></button></div>`;
+    h += `<b>Zona de cámara: arrastrar mueve…</b>` + chipsM([["der", "Stick derecho (mando)"], ["mouse", "El mouse"]], mSel.modo, "modo") +
+      `<div class="fila"><span>Sensibilidad</span><input type="range" min="0.2" max="5" step="0.1" value="${mSel.sens}" data-rango="sens"><span>${(+mSel.sens).toFixed(1)}</span></div>` +
+      (mSel.modo === "mouse" ? `<div class="fila"><span>Mantener clic al arrastrar<br><small style="color:var(--suave)">(juegos donde la cámara gira arrastrando)</small></span><button class="sw ${mSel.conClic ? "on" : ""}" data-sw="conClic"></button></div>` : "");
   }
   if(mSel) h += `<div class="acc"><button class="rojo" data-hacer="quitar">🗑 Quitar este</button></div><hr style="border:0;border-top:1px solid var(--borde);margin:10px 0 4px">`;
   h += `<div class="fila"><span>Transparencia</span><input type="range" min="0.15" max="1" step="0.05" value="${p.opacidad}" data-rango="opacidad"><span>${Math.round(p.opacidad * 100)} %</span></div>` +
@@ -3125,17 +3232,21 @@ function pintarPanelM(){
 }
 $("mandoPanel").addEventListener("click", e => {
   const b = e.target.closest("button"); if(!b) return;
-  const p = perfilM(), d = b.dataset;
+  const p = perfilM(), d = b.dataset, xb = p.tipo === "xbox";
   if(d.k !== undefined && mSel){ mSel.a = {k: d.k}; }
+  else if(d.x !== undefined && mSel){ mSel.a = {x: d.x}; }
   else if(d.otra !== undefined && mSel){ mSel.a = {...OTRAS_M[+d.otra][1]}; }
   else if(d.forma && mSel){ mSel.forma = d.forma; }
-  else if(d.flechas !== undefined && mSel){ mSel.flechas = d.flechas === "1"; }
+  else if(d.modo && mSel){ mSel.modo = d.modo; }
   else if(d.sw){ const o = d.global ? p : mSel; if(o) o[d.sw] = !o[d.sw]; }
   else if(d.hacer === "quitar" && mSel){ p.controles = p.controles.filter(c => c !== mSel); mSel = null; }
-  else if(d.hacer === "boton"){ mSel = bt(.5, .5, .15, {k: "KeyF"}); p.controles.push(mSel); }
-  else if(d.hacer === "stick"){ mSel = {tipo: "stick", x: .15, y: .65, t: .42, flechas: false}; p.controles.push(mSel); }
-  else if(d.hacer === "zona"){ mSel = {tipo: "zona", x: .6, y: .4, w: .27, h: .4, sens: 1.6, conClic: false}; p.controles.push(mSel); }
-  else if(d.hacer === "base"){ if(!confirm("¿Volver a los botones de fábrica en este perfil?")) return; const n = p.nombre; mandos.lista[mandos.sel] = Object.assign(mandoBase(), {nombre: n}); mSel = null; }
+  else if(d.hacer === "boton"){ mSel = bt(.5, .5, .15, xb ? {x: "A"} : {k: "KeyF"}); p.controles.push(mSel); }
+  else if(d.hacer === "stick"){ mSel = {tipo: "stick", x: .15, y: .65, t: .42, modo: xb ? "izq" : "wasd"}; p.controles.push(mSel); }
+  else if(d.hacer === "zona"){ mSel = {tipo: "zona", x: .6, y: .4, w: .27, h: .4, sens: xb ? 1 : 1.6, modo: xb ? "der" : "mouse", conClic: false}; p.controles.push(mSel); }
+  else if(d.hacer === "base"){
+    if(!confirm("¿Volver a los botones de fábrica en este perfil?")) return;
+    mandos.lista[mandos.sel] = Object.assign(xb ? mandoXbox() : mandoBase(), {nombre: p.nombre}); mSel = null;
+  }
   else if(d.hacer === "cancelar"){ mandos.lista[mandos.sel] = respaldoM; salirEdicionM(false); return; }
   else if(d.hacer === "listo"){ salirEdicionM(true); return; }
   else return;
@@ -3147,25 +3258,70 @@ $("mandoPanel").addEventListener("input", e => {
   o[r] = +e.target.value;
   e.target.nextElementSibling.textContent = r === "sens" ? (+o[r]).toFixed(1) : Math.round(o[r] * 100) + " %";
   if(r === "opacidad") mandoEl.style.setProperty("--op", o[r]);
+  if(r === "sens" && o._el) o._el.firstChild && (o._el.innerHTML = textoZona(o) + '<div class="mh"></div>');
 });
 function entrarEdicionM(){
   mandoSoltar();
-  respaldoM = JSON.parse(JSON.stringify(perfilM(), (k, v) => k.startsWith("_") ? undefined : v));
-  mEdit = true; mSel = null; $("mandoPerfiles").classList.add("oculto");
-  $("mandoPanel").classList.remove("oculto"); $("mandoBarra").classList.add("oculto");
+  respaldoM = JSON.parse(JSON.stringify(perfilM(), limpioM));
+  mEdit = true; mSel = null; cerrarPopM();
+  $("mandoPanel").classList.remove("oculto");
   pintarMando(); pintarPanelM();
 }
 function salirEdicionM(guardar){
   mEdit = false; mSel = null;
-  $("mandoPanel").classList.add("oculto"); $("mandoBarra").classList.remove("oculto");
+  $("mandoPanel").classList.add("oculto");
   if(guardar){ guardarMandos(); toast("Botones guardados"); }
-  pintarMando();
+  actualizarBarraM(); pintarMando();
 }
+
+// ---------- Velocidad de la cámara (en el menú de la burbuja) ----------
+// Cinco botones con nombre en vez de números: cualquiera lo entiende.
+const VEL_M = {mouse: [.6, 1, 1.6, 2.5, 4], der: [.5, .75, 1, 1.5, 2.2]};
+const NOM_VEL = ["Muy lenta", "Lenta", "Normal", "Rápida", "Muy rápida"];
+const zonaM = () => perfilM().controles.find(c => c.tipo === "zona");
+function velIndice(z){
+  const v = VEL_M[z.modo === "der" ? "der" : "mouse"];
+  let mejor = 0;
+  v.forEach((x, i) => { if(Math.abs(x - z.sens) < Math.abs(v[mejor] - z.sens)) mejor = i; });
+  return mejor;
+}
+function pintarPanelMando(){
+  const sec = $("pbMando");
+  sec.classList.toggle("oculto", !mandoOn);
+  if(!mandoOn) return;
+  $("pbmPerfiles").innerHTML = mandos.lista.map((p, i) => `<button data-i="${i}" class="${i === mandos.sel ? "sel" : ""}">${p.tipo === "xbox" ? "🎮" : "⌨"} ${escapar(p.nombre)}</button>`).join("") +
+    `<button data-salir="1">✕ Quitar mando</button>`;
+  const z = zonaM();
+  if(!z){ $("pbmVel").innerHTML = `<small style="grid-column:1/-1;color:var(--suave)">Este perfil no tiene zona de cámara (agrégala en ✎).</small>`; return; }
+  const sel = velIndice(z);
+  $("pbmVel").innerHTML = NOM_VEL.map((n, i) => `<button data-v="${i}" class="${i === sel ? "sel" : ""}"><i style="height:${6 + i * 5}px"></i>${n}</button>`).join("");
+}
+$("pbmPerfiles").addEventListener("click", e => {
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.salir){ ocultarBarra(); alternarMando(false); return; }
+  mandoSoltar(); mandos.sel = +b.dataset.i; guardarMandos();
+  pintarMando(); pintarPanelMando(); revisarXboxM();
+  toast((perfilM().tipo === "xbox" ? "🎮 " : "⌨ ") + perfilM().nombre);
+});
+$("pbmVel").addEventListener("click", e => {
+  const b = e.target.closest("button[data-v]"); if(!b) return;
+  const z = zonaM(); if(!z) return;
+  const i = +b.dataset.v;
+  z.sens = VEL_M[z.modo === "der" ? "der" : "mouse"][i];
+  guardarMandos(); pintarPanelMando();
+  if(z._el) z._el.innerHTML = textoZona(z);
+  toast("Cámara: " + NOM_VEL[i]);
+});
+$("pbmEditar").onclick = () => { ocultarBarra(); entrarEdicionM(); };
+$("pbmMas").onclick = () => { ocultarBarra(); cerrarPopM(); pintarPerfilesM(); $("mandoPerfiles").classList.remove("oculto"); };
+function cerrarPopM(){ $("mandoPerfiles").classList.add("oculto"); }
+// Tocar fuera del menú de perfiles lo cierra.
+$("mando").addEventListener("pointerdown", () => cerrarPopM(), true);
 
 // ---------- Perfiles (uno por juego) ----------
 function pintarPerfilesM(){
   const m = $("mandoPerfiles");
-  m.innerHTML = mandos.lista.map((p, i) => `<button data-i="${i}" class="${i === mandos.sel ? "sel" : ""}">${i === mandos.sel ? "✓ " : ""}${escapar(p.nombre)}</button>`).join("") +
+  m.innerHTML = mandos.lista.map((p, i) => `<button data-i="${i}" class="${i === mandos.sel ? "sel" : ""}">${i === mandos.sel ? "✓ " : ""}${p.tipo === "xbox" ? "🎮" : "⌨"} ${escapar(p.nombre)}</button>`).join("") +
     `<hr><button data-p="nuevo">＋ Nuevo perfil (copia de este)</button><button data-p="nombre">✎ Cambiar nombre</button>` +
     (mandos.lista.length > 1 ? `<button data-p="borrar" style="color:#ff9a95">🗑 Borrar este perfil</button>` : "");
 }
@@ -3175,7 +3331,7 @@ $("mandoPerfiles").addEventListener("click", e => {
   if(b.dataset.i !== undefined){ mandos.sel = +b.dataset.i; }
   else if(b.dataset.p === "nuevo"){
     const n = prompt("Nombre del perfil (por ejemplo, el juego):", ""); if(!n) return;
-    const copia = JSON.parse(JSON.stringify(perfilM(), (k, v) => k.startsWith("_") ? undefined : v)); copia.nombre = n.slice(0, 40);
+    const copia = JSON.parse(JSON.stringify(perfilM(), limpioM)); copia.nombre = n.slice(0, 40);
     mandos.lista.push(copia); mandos.sel = mandos.lista.length - 1;
   } else if(b.dataset.p === "nombre"){
     const n = prompt("Nuevo nombre:", perfilM().nombre); if(!n) return; perfilM().nombre = n.slice(0, 40);
@@ -3183,12 +3339,44 @@ $("mandoPerfiles").addEventListener("click", e => {
     if(!confirm(`¿Borrar el perfil «${perfilM().nombre}»?`)) return;
     mandos.lista.splice(mandos.sel, 1); mandos.sel = 0;
   }
-  guardarMandos(); $("mandoPerfiles").classList.add("oculto"); actualizarBarraM(); pintarMando();
+  guardarMandos(); cerrarPopM(); actualizarBarraM(); pintarMando(); revisarXboxM();
 });
-function actualizarBarraM(){ $("mPerfil").textContent = "⌨ " + perfilM().nombre + " ▾"; }
-$("mPerfil").onclick = () => { const m = $("mandoPerfiles"); if(m.classList.contains("oculto")){ pintarPerfilesM(); m.classList.remove("oculto"); } else m.classList.add("oculto"); };
-$("mEditar").onclick = entrarEdicionM;
-$("mCerrar").onclick = () => alternarMando(false);
+function actualizarBarraM(){ pintarPanelMando(); }
+
+// ---------- Avisos de la PC sobre el mando Xbox ----------
+function revisarXboxM(){
+  if(!(mandoOn && perfilM().tipo === "xbox" && visorActivo())) return;
+  if(funcionesHost.length && !funcionesHost.includes("mando")){
+    avisoXboxM(`<b>🎮 Mando Xbox</b><div class="nota">La PC tiene una versión de RemotoPC sin mando Xbox. Actualízala (se actualiza sola cuando no hay nadie conectado) o usa un perfil de teclas.</div><div class="acc"><button data-xb="teclas">Usar teclas</button><button class="azul" data-xb="cerrar">Entendido</button></div>`);
+    return;
+  }
+  mandarPad(true); // si al conectarse falta el controlador, la PC avisa
+}
+function avisoXboxM(html){ const m = $("mandoAviso"); m.innerHTML = html; m.classList.remove("oculto"); }
+function avisoMandoPC(m){
+  if(m.estado === "ok"){ $("mandoAviso").classList.add("oculto"); toast("🎮 Mando Xbox conectado en la PC"); }
+  else if(m.estado === "falta"){
+    if(!(mandoOn && perfilM().tipo === "xbox")) return;
+    if(!$("mandoAviso").classList.contains("oculto")) return;
+    avisoXboxM(`<b>🎮 Falta un controlador en la PC</b><div class="nota">Para que la PC vea un mando Xbox hay que instalar <b>ViGEmBus</b> (gratis, se instala una sola vez).<br>Al tocar «Instalar», en la PC aparece un aviso de Windows pidiendo permiso: hay que aceptarlo <b>en la PC</b>.</div><div class="acc"><button data-xb="teclas">Usar teclas</button><button class="azul" data-xb="instalar">Instalar</button></div>`);
+  }
+  else if(m.estado === "instalando") avisoXboxM(`<b>⏳ Instalando el controlador…</b><div class="nota">Acepta el aviso de Windows en la PC. Tarda menos de un minuto.</div>`);
+  else if(m.estado === "instalado"){ $("mandoAviso").classList.add("oculto"); toast("✓ Controlador instalado. Conectando el mando…"); mandarPad(true); }
+  else if(m.estado === "error") avisoXboxM(`<b>No se pudo usar el mando Xbox</b><div class="nota">${escapar(m.msg || "Error desconocido")}</div><div class="acc"><button data-xb="teclas">Usar teclas</button><button class="azul" data-xb="cerrar">Cerrar</button></div>`);
+}
+$("mandoAviso").addEventListener("click", e => {
+  const b = e.target.closest("button[data-xb]"); if(!b) return;
+  const a = b.dataset.xb;
+  if(a === "instalar"){ enviar(["ginstalar"]); avisoXboxM(`<b>⏳ Bajando el instalador en la PC…</b><div class="nota">En un momento aparece el aviso de Windows en la PC.</div>`); return; }
+  $("mandoAviso").classList.add("oculto");
+  if(a === "teclas"){
+    mandoSoltar();
+    const i = mandos.lista.findIndex(p => p.tipo !== "xbox");
+    if(i < 0) mandos.lista.push(mandoBase());
+    mandos.sel = i < 0 ? mandos.lista.length - 1 : i;
+    guardarMandos(); actualizarBarraM(); pintarMando();
+  }
+});
 
 // ---------- Encender / apagar ----------
 function alternarMando(on){
@@ -3202,16 +3390,17 @@ function alternarMando(on){
     ocultarBarra();
     if(!enPantallaCompleta) entrarPantallaCompleta().then(girarHorizontal);
     else girarHorizontal();
-    mostrarPista("Modo mando · ✎ Editar para mover los botones o cambiar sus teclas", 3500);
+    mostrarPista("Modo mando · toca la burbuja para la velocidad de la cámara o mover botones", 4000);
   }
   mostrarMando();
+  pintarPanelMando();
+  revisarXboxM();
 }
 function girarHorizontal(){ try{ const p = screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape"); if(p && p.catch) p.catch(() => {}); }catch(e){} }
 function mostrarMando(){
   const ver = mandoOn && visorActivo();
   mandoEl.classList.toggle("oculto", !ver);
-  $("mandoBarra").classList.toggle("oculto", !ver || mEdit);
-  if(!ver){ $("mandoPerfiles").classList.add("oculto"); $("mandoPanel").classList.add("oculto"); }
+  if(!ver){ cerrarPopM(); $("mandoPanel").classList.add("oculto"); $("mandoAviso").classList.add("oculto"); }
   $("bTecladoT").classList.toggle("oculto", !tactil || ver);
   if(ver){ actualizarBarraM(); pintarMando(); }
 }
@@ -3219,9 +3408,10 @@ $("bMando").onclick = () => alternarMando();
 mandoOn = tactil && localStorage.getItem("mandoOn") === "1";
 $("bMando").classList.toggle("on", mandoOn);
 addEventListener("resize", () => { if(mandoOn && visorActivo()) setTimeout(pintarMando, 60); });
+document.addEventListener("visibilitychange", () => { if(document.hidden) mandoSoltar(); });
 setInterval(() => {
   const ver = mandoOn && visorActivo();
-  if(ver === mandoEl.classList.contains("oculto")) mostrarMando();
+  if(ver === mandoEl.classList.contains("oculto")){ mostrarMando(); if(ver) setTimeout(revisarXboxM, 1500); }
 }, 500);
 
 // ---------------- Arranque ----------------
